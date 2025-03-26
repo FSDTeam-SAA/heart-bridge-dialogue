@@ -7,6 +7,9 @@ import NoRelationship from "../pages/DashPage/NoRelationship";
 import Upgrade from "../pages/Upgrade";
 import SignUp from "../pages/Authentication/SignUp";
 import Login from "../pages/Authentication/Login";
+import Account from "../pages/Account/Account";
+import Profile from "../pages/Account/Profile";
+import Subscription from "../pages/Account/Subscription";
 
 const router = createBrowserRouter([
     {
@@ -32,7 +35,21 @@ const router = createBrowserRouter([
             {
                 path : "/login",
                 element : <Login />
-            }
+            },
+            {
+                path: '/account',
+                element: <Account />,
+                children: [
+                  {
+                    path: '/account',
+                    element: <Profile />,
+                  },
+                  {
+                    path: 'subscription',
+                    element: <Subscription />,
+                  },
+                ],
+            },
         ]
 
     },

@@ -67,9 +67,9 @@ export default function Navbar() {
           {/* Logo and brand name */}
           <Link
             to="/"
-            className="flex items-center gap-2 text-xl font-semibold text-[#C62553]"
+            className="flex items-center gap-2 text-xl font-bold text-[#C62553]"
           >
-            <Heart className="h-5 w-5 fill-[#C62553]" />
+            <Heart className="h-5 w-5" />
             <span>HeartBridge</span>
           </Link>
 
@@ -98,7 +98,7 @@ export default function Navbar() {
                   {/* User dropdown menu */}
                   {isDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-64 rounded-lg bg-white shadow-lg border border-gray-100 z-50 p-2">
-                      <Link to={"/profile"}>
+                      <Link to={"/account"}>
                         <div className="px-4 pb-2 mb-1 border-b border-gray-100 hover:bg-[#C6255310] hover:text-[#C62553] rounded-lg">
                           <div className="font-medium">Account</div>
                           <div className="text-sm text-gray-500">
@@ -198,7 +198,7 @@ export default function Navbar() {
               {/* User dropdown menu */}
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-64 rounded-lg bg-white shadow-lg border border-gray-100 z-50 p-2">
-                  <Link to={"/profile"}>
+                  <Link to={"/account"}>
                     <div className="px-4 pb-2 mb-1 border-b border-gray-100 hover:bg-[#C6255310] hover:text-[#C62553] rounded-lg">
                       <div className="font-medium">Account</div>
                       <div className="text-sm text-gray-500">
