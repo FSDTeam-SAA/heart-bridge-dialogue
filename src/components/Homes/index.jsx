@@ -1,9 +1,10 @@
 import React from "react";
+import MultiStepForm from "./MultiStepForm/MultiStepForm";
 
 const HomeAllComponents = () => {
   return (
     <div>
-        home all components provide
+        <MultiStepForm/>
     </div>
   );
 };
