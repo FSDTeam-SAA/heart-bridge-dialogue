@@ -20,7 +20,7 @@ export default {
       },
       colors: {
         primary: {
-          DEFAULT: "#224260",
+          DEFAULT: "#ec4d80",
           
         },
         secondary: {
