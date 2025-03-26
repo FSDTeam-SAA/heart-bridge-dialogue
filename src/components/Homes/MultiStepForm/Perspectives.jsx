@@ -2,7 +2,6 @@ import React from "react";
 import { useFormContext } from "react-hook-form";
 import { FaArrowRight } from "react-icons/fa6";
 import { FiUser } from "react-icons/fi";
-import { MdOutlineKeyboardVoice } from "react-icons/md";
 
 const Perspectives = ({ handleNextStep, handlePreviousStep }) => {
   const {
@@ -21,18 +20,13 @@ const Perspectives = ({ handleNextStep, handlePreviousStep }) => {
         {/* first form  */}
         <div className="md:col-span-1 ">
           <div className=" border border-gray shadow-lg rounded-lg p-6 mt-5">
-            <div className="w-full flex items-center justify-between pb-6">
-              <div className="flex items-center gap-3">
-                <span className="bg-rose-50 p-2 rounded-full flex items-center justify-center">
-                  <FiUser className="w-4 h-4 text-primary" />
-                </span>
-                <h3 className="text-xl font-semibold leading-[28px] text-black">
-                  Your Perspective
-                </h3>
-              </div>
-              <div className="bg-white border border-rose-100 cursor-pointer hover:bg-rose-100 p-2 rounded-full flex items-center justify-center">
-                <MdOutlineKeyboardVoice className="w-4 h-4 text-primary" />
-              </div>
+            <div className="flex items-center gap-3 pb-6">
+              <span className="bg-rose-50 p-2 rounded-full flex items-center justify-center">
+                <FiUser className="w-4 h-4 text-primary" />
+              </span>
+              <h3 className="text-xl font-semibold leading-[28px] text-black">
+                Your Perspective
+              </h3>
             </div>
             {/* first part  */}
             <div>
@@ -83,19 +77,13 @@ const Perspectives = ({ handleNextStep, handlePreviousStep }) => {
         {/* second form  */}
         <div className="md:col-span-1">
           <div className=" border border-gray shadow-lg rounded-lg p-6 mt-5">
-
-            <div className="w-full flex items-center justify-between pb-6">
-              <div className="flex items-center gap-3">
-                <span className="bg-rose-50 p-2 rounded-full flex items-center justify-center">
-                  <FiUser className="w-4 h-4 text-primary" />
-                </span>
-                <h3 className="text-xl font-semibold leading-[28px] text-black">
-                  Their Perspective
-                </h3>
-              </div>
-              <div className="bg-white border border-rose-100 cursor-pointer hover:bg-rose-100 p-2 rounded-full flex items-center justify-center">
-                <MdOutlineKeyboardVoice className="w-4 h-4 text-primary" />
-              </div>
+            <div className="flex items-center gap-3 pb-6">
+              <span className="bg-rose-50 p-2 rounded-full flex items-center justify-center">
+                <FiUser className="w-4 h-4 text-primary" />
+              </span>
+              <h3 className="text-xl font-semibold leading-[28px] text-black">
+                Their Perspective
+              </h3>
             </div>
             {/* first part  */}
             <div>
