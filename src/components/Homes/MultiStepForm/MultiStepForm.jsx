@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
@@ -7,12 +7,31 @@ import BasicInfo from "./BasicInfo";
 import Perspectives from "./Perspectives";
 import Personalities from "./Personalities";
 import ProgressStepper from "./progress-stepper";
+import AllInformation from "./AllInformation";
 
 const MultiStepForm = () => {
   const navigate = useNavigate();
   const methods = useForm();
-  const { trigger } = methods;
+  const { trigger, watch, setValue, reset } = methods;
   const [currentStep, setCurrentStep] = useState(1);
+
+   // Load form data from localStorage on mount
+   useEffect(() => {
+    const savedData = localStorage.getItem("multiStepFormData");
+    if (savedData) {
+      const parsedData = JSON.parse(savedData);
+      Object.keys(parsedData).forEach((key) => {
+        setValue(key, parsedData[key]);
+      });
+    }
+  }, [setValue]);
+
+  const formData = watch();
+
+   // Save form data to localStorage
+   useEffect(() => {
+    localStorage.setItem("multiStepFormData", JSON.stringify(formData));
+  }, [formData]);
 
   // Handle next step change
   const handleNextStep = async () => {
@@ -28,13 +47,21 @@ const MultiStepForm = () => {
 
   // Handle form submission
   const onSubmit = (data) => {
-    console.log(data);
+    console.log("Form Data Submitted:", data);
+    toast.success("Form submitted successfully!");
+    localStorage.removeItem("multiStepFormData"); // Clear storage on submit
+    reset();
+
+    // Navigate to the dashboard
+    setTimeout(() => {
+      navigate("/dashboard");
+    }, 1500);
   };
 
   return (
     <div className="container bg-white">
       {/* Toast Notifications */}
-      <ToastContainer />
+      <ToastContainer position="top-center" autoClose={2000}/>
       {/* navbar end  */}
       <FormProvider {...methods}>
         <div className="mt-8">
@@ -44,6 +71,7 @@ const MultiStepForm = () => {
                 { id: 1, label: "Basic Info" },
                 { id: 2, label: "Perspectives" },
                 { id: 3, label: "Personalities" },
+                { id: 4, label: "Review & Submit" },
             ]}
           />
         </div>
@@ -69,6 +97,14 @@ const MultiStepForm = () => {
               <Personalities
                 handleNextStep={handleNextStep}
                 handlePreviousStep={handlePreviousStep}
+              />
+            )}
+            {currentStep === 4 && (
+              <AllInformation
+                handleNextStep={handleNextStep}
+                handlePreviousStep={handlePreviousStep}
+                data={formData}
+                handleSubmitForm={onSubmit}
               />
             )}
           </form>
