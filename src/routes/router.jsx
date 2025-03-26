@@ -5,6 +5,8 @@ import Home from "../pages/Home";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import NoRelationship from "../pages/DashPage/NoRelationship";
 import Upgrade from "../pages/Upgrade";
+import SignUp from "../pages/Authentication/SignUp";
+import Login from "../pages/Authentication/Login";
 
 const router = createBrowserRouter([
     {
@@ -22,6 +24,14 @@ const router = createBrowserRouter([
             {
                 path : "upgrade",
                 element : <Upgrade />
+            },
+            {
+                path : "/signup",
+                element : <SignUp />
+            },
+            {
+                path : "/login",
+                element : <Login />
             }
         ]
 
