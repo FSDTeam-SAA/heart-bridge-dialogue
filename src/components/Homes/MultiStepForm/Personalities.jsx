@@ -374,7 +374,7 @@ const Personalities = ({ handlePreviousStep }) => {
           type="submit"
           className="bg-rose-500 flex items-center gap-2 text-white py-2 px-5 rounded-lg text-base font-semibold leading-normal"
         >
-          Next Step <FaArrowRight className="mt-1" />
+          Get Started <FaArrowRight className="mt-1" />
         </button>
       </div>
     </div>

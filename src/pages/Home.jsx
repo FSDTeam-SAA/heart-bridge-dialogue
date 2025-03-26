@@ -1,10 +1,9 @@
 import React from 'react';
-import HomeAllComponents from '../components/Homes';
 
 const Home = () => {
     return (
         <div className=''>
-            <HomeAllComponents/>
+            <h1>This is home page</h1>
         </div>
     );
 };
