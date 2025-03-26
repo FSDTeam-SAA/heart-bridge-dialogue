@@ -38,7 +38,8 @@ export default function Navbar() {
                 className="flex items-center gap-1 rounded-full border border-gray-200 px-4 py-1.5 text-[18px] font-medium text-rose-500 hover:bg-[#FDF2F6]"
               >
                 <Sparkles className="h-4 w-4 text-rose-500" />
-                Upgrade
+                Upgrade ||| Lorem ipsum dolor sit amet consectetur adipisicing
+                elit. Animi architecto corporis voluptatem.
               </a>
               <div className="relative">
                 <button
