@@ -32,12 +32,12 @@ const MultiStepForm = () => {
   };
 
   return (
-    <div className="container">
+    <div className="container bg-white">
       {/* Toast Notifications */}
       <ToastContainer />
       {/* navbar end  */}
       <FormProvider {...methods}>
-        <div className="mb-6">
+        <div className="mt-8">
           <ProgressStepper
             currentStep={currentStep}
             steps={[
@@ -48,10 +48,10 @@ const MultiStepForm = () => {
           />
         </div>
 
-        <div className="container">
+        <div className="container ">
           <form
             onSubmit={methods.handleSubmit(onSubmit)}
-            className="mt-6 bg-primary rounded-[12px] md:rounded-l-[12px]"
+            className="mt-6 rounded-[12px] md:rounded-l-[12px]"
           >
             {currentStep === 1 && (
               <BasicInfo

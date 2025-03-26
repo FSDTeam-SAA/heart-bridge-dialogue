@@ -11,7 +11,7 @@ export default function ProgressStepper({ steps, currentStep = 1 }) {
           return (
             <React.Fragment key={step.id}>
               {/* Step Circle */}
-              <div className="flex flex-col items-center">
+              <div className="flex items-center gap-3">
                 <div
                   className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
                     isActive ? "bg-rose-500 text-white" : "bg-rose-200 text-gray-700"
@@ -19,7 +19,7 @@ export default function ProgressStepper({ steps, currentStep = 1 }) {
                 >
                   {step.id}
                 </div>
-                <span className="mt-2 text-sm font-medium text-gray-600">{step.label}</span>
+                <span className="text-sm font-medium text-gray-600">{step.label}</span>
               </div>
 
               {/* Connector Line */}

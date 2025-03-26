@@ -1,7 +1,8 @@
 import React from "react";
 import { useFormContext } from "react-hook-form";
+import { FaArrowRight } from "react-icons/fa6";
 
-const Personalities = ({ handleNextStep, handlePreviousStep }) => {
+const Personalities = ({ handlePreviousStep }) => {
   const {
     register,
     formState: { errors },
@@ -121,24 +122,30 @@ const Personalities = ({ handleNextStep, handlePreviousStep }) => {
     },
   ];
   return (
-    <div className="bg-white">
+    <div className="w-4/5 mx-auto">
+      <h2 className="text-3xl font-bold leading-[36px] text-[#c02351] text-center">
+        Personality details
+      </h2>
+      <p className="text-base font-normal leading-[24px] text-[#71717a] text-center pt-1">
+        Understanding your relationship dynamics
+      </p>
       {/* first part  */}
-      <div className="bg-white border border-gray rounded-lg p-6">
+      <div className="border border-gray shadow-lg rounded-lg p-8 mt-5">
         {/* first part  */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 my-5">
           <div className="col-span-1">
             <label
-              className="text-lg font-bold leading-normal text-black"
+              className="text-lg font-medium leading-normal text-black"
               htmlFor="loveLanguage1"
             >
               Love Language <span className="text-red-500">*</span>
             </label>
             <select
               {...register("loveLanguage1", { required: true })}
-              className="w-full border border-gray py-2 px-4 rounded-lg mt-4"
+              className="w-full border border-gray py-2 px-2 rounded-lg mt-2"
             >
               <option value="" disabled selected>
-              Select Love Language
+                Select Love Language
               </option>
               {loveLanguageData?.map((data) => (
                 <option key={data?.id} value={data?.value}>
@@ -155,14 +162,14 @@ const Personalities = ({ handleNextStep, handlePreviousStep }) => {
           </div>
           <div className="col-span-1">
             <label
-              className="text-lg font-bold leading-normal text-black"
+              className="text-lg font-medium leading-normal text-black"
               htmlFor="loveLanguage2"
             >
               Love Language <span className="text-red-500">*</span>
             </label>
             <select
               {...register("loveLanguage2", { required: true })}
-              className="w-full border border-gray py-2 px-4 rounded-lg mt-4"
+              className="w-full border border-gray py-2 px-2 rounded-lg mt-2"
             >
               <option value="" disabled selected>
                 Select Love Language
@@ -182,20 +189,20 @@ const Personalities = ({ handleNextStep, handlePreviousStep }) => {
           </div>
         </div>
         {/* two part  */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 my-5">
           <div className="col-span-1">
             <label
-              className="text-lg font-bold leading-normal text-black"
+              className="text-lg font-medium leading-normal text-black"
               htmlFor="communicationStyle1"
             >
               Communication Style <span className="text-red-500">*</span>
             </label>
             <select
               {...register("communicationStyle1", { required: true })}
-              className="w-full border border-gray py-2 px-4 rounded-lg mt-4"
+              className="w-full border border-gray py-2 px-2 rounded-lg mt-2"
             >
               <option value="" disabled selected>
-              Select communication style
+                Select communication style
               </option>
               {communicationStyleData?.map((data) => (
                 <option key={data?.id} value={data?.value}>
@@ -212,14 +219,14 @@ const Personalities = ({ handleNextStep, handlePreviousStep }) => {
           </div>
           <div className="col-span-1">
             <label
-              className="text-lg font-bold leading-normal text-black"
+              className="text-lg font-medium leading-normal text-black"
               htmlFor="communicationStyle2"
             >
               Communication Style <span className="text-red-500">*</span>
             </label>
             <select
               {...register("communicationStyle2", { required: true })}
-              className="w-full border border-gray py-2 px-4 rounded-lg mt-4"
+              className="w-full border border-gray py-2 px-2 rounded-lg mt-2"
             >
               <option value="" disabled selected>
                 Select communication style
@@ -239,20 +246,20 @@ const Personalities = ({ handleNextStep, handlePreviousStep }) => {
           </div>
         </div>
         {/* three part  */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 my-5">
           <div className="col-span-1">
             <label
-              className="text-lg font-bold leading-normal text-black"
+              className="text-lg font-medium leading-normal text-black"
               htmlFor="conflictStyle1"
             >
               Conflict Style <span className="text-red-500">*</span>
             </label>
             <select
               {...register("conflictStyle1", { required: true })}
-              className="w-full border border-gray py-2 px-4 rounded-lg mt-4"
+              className="w-full border border-gray py-2 px-2 rounded-lg mt-2"
             >
               <option value="" disabled selected>
-              Select conflict style
+                Select conflict style
               </option>
               {conflictStyleData?.map((data) => (
                 <option key={data?.id} value={data?.value}>
@@ -269,14 +276,14 @@ const Personalities = ({ handleNextStep, handlePreviousStep }) => {
           </div>
           <div className="col-span-1">
             <label
-              className="text-lg font-bold leading-normal text-black"
+              className="text-lg font-medium leading-normal text-black"
               htmlFor="conflictStyle2"
             >
               Conflict Style <span className="text-red-500">*</span>
             </label>
             <select
               {...register("conflictStyle2", { required: true })}
-              className="w-full border border-gray py-2 px-4 rounded-lg mt-4"
+              className="w-full border border-gray py-2 px-2 rounded-lg mt-2"
             >
               <option value="" disabled selected>
                 Select conflict style
@@ -296,17 +303,17 @@ const Personalities = ({ handleNextStep, handlePreviousStep }) => {
           </div>
         </div>
         {/* foure part  */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 my-5">
           <div className="col-span-1">
             <label
-              className="text-lg font-bold leading-normal text-black"
+              className="text-lg font-medium leading-normal text-black"
               htmlFor="attachmentStyle1"
             >
               Attachment Style <span className="text-red-500">*</span>
             </label>
             <select
               {...register("attachmentStyle1", { required: true })}
-              className="w-full border border-gray py-2 px-4 rounded-lg mt-4"
+              className="w-full border border-gray py-2 px-2 rounded-lg mt-2"
             >
               <option value="" disabled selected>
                 Select relationship length
@@ -326,14 +333,14 @@ const Personalities = ({ handleNextStep, handlePreviousStep }) => {
           </div>
           <div className="col-span-1">
             <label
-              className="text-lg font-bold leading-normal text-black"
+              className="text-lg font-medium leading-normal text-black"
               htmlFor="attachmentStyle2"
             >
               Attachment Style <span className="text-red-500">*</span>
             </label>
             <select
               {...register("attachmentStyle2", { required: true })}
-              className="w-full border border-gray py-2 px-4 rounded-lg mt-4"
+              className="w-full border border-gray py-2 px-2 rounded-lg mt-2"
             >
               <option value="" disabled selected>
                 Select relationship length
@@ -355,19 +362,19 @@ const Personalities = ({ handleNextStep, handlePreviousStep }) => {
       </div>
 
       {/* buttton  */}
-      <div className="mt-7 w-full flex items-center justify-between">
+      <div className="mt-10 w-full flex items-center justify-between">
         <button
           type="button"
           onClick={handlePreviousStep}
-          className="bg-rose-500 text-white py-2 px-5 rounded-lg "
+          className="bg-white text-black border border-gray rounded-lg py-2 px-5 text-base font-semibold leading-normal "
         >
           Back
         </button>
         <button
           type="submit"
-          className="bg-rose-500 text-white py-2 px-5 rounded-lg "
+          className="bg-rose-500 flex items-center gap-2 text-white py-2 px-5 rounded-lg text-base font-semibold leading-normal"
         >
-          Next Step
+          Next Step <FaArrowRight className="mt-1" />
         </button>
       </div>
     </div>
