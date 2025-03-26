@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { FaArrowRight } from "react-icons/fa6";
 
-const Personalities = ({ handlePreviousStep }) => {
+const Personalities = ({ handlePreviousStep, handleNextStep }) => {
   const {
     register,
     formState: { errors },
@@ -371,7 +371,8 @@ const Personalities = ({ handlePreviousStep }) => {
           Back
         </button>
         <button
-          type="submit"
+          type="button"
+          onClick={handleNextStep}
           className="bg-rose-500 flex items-center gap-2 text-white py-2 px-5 rounded-lg text-base font-semibold leading-normal"
         >
           Get Started <FaArrowRight className="mt-1" />
