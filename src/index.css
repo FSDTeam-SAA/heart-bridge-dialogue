@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.roboto_font {
+    font-family: "Roboto", serif;
+}
+
+body {
+    @apply bg-[#FFFFFF] overflow-x-hidden;
+}
+
+
+.padding_top{
+    @apply pt-10 md:pt-12 lg:pt-14 xl:pt-16 2xl:pt-[110px]
+}
+.padding_all{
+    @apply py-10 md:py-12 lg:py-14 xl:py-16 2xl:py-[110px]
+}
