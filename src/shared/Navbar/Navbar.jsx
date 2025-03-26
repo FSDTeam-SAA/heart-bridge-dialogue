@@ -1,63 +1,74 @@
-import { useState, useEffect, useRef } from "react"
-import { Heart, Menu, X, Sparkles, User, LayoutDashboard, LogOut } from "lucide-react"
-import { Link } from "react-router-dom"
+import { useState, useEffect, useRef } from "react";
+import {
+  Heart,
+  Menu,
+  X,
+  Sparkles,
+  User,
+  LayoutDashboard,
+  LogOut,
+} from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const dropdownRef = useRef(null)
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false)
+        setIsDropdownOpen(false);
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside)
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Prevent scrolling when menu is open
   useEffect(() => {
     if (isMenuOpen) {
-      document.body.style.overflow = "hidden"
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = "unset"
+      document.body.style.overflow = "unset";
     }
     return () => {
-      document.body.style.overflow = "unset"
-    }
-  }, [isMenuOpen])
+      document.body.style.overflow = "unset";
+    };
+  }, [isMenuOpen]);
 
   const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen)
-  }
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen)
-  }
+    setIsDropdownOpen(!isDropdownOpen);
+  };
 
   const handleLogin = () => {
-    setIsLoggedIn(true)
-  }
+    setIsLoggedIn(true);
+  };
 
   const handleLogout = () => {
-    setIsLoggedIn(false)
-    setIsMenuOpen(false)
-    setIsDropdownOpen(false)
-  }
+    setIsLoggedIn(false);
+    setIsMenuOpen(false);
+    setIsDropdownOpen(false);
+  };
 
   return (
     <>
       <nav className="w-full bg-white px-4 py-3 sticky top-0 z-40">
         <div className="container flex items-center justify-between">
           {/* Logo and brand name */}
-          <Link to="/" className="flex items-center gap-2 text-xl font-semibold text-[#C62553]">
+          <Link
+            to="/"
+            className="flex items-center gap-2 text-xl font-semibold text-[#C62553]"
+          >
             <Heart className="h-5 w-5 fill-[#C62553]" />
             <span>HeartBridge</span>
           </Link>
@@ -73,6 +84,8 @@ export default function Navbar() {
                   <Sparkles className="h-4 w-4 text-[#C62553]" />
                   Upgrade
                 </Link>
+
+                {/* this dropdown menu is for desktop user */}
                 <div className="relative" ref={dropdownRef}>
                   <button
                     className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-700 hover:bg-[#C6255310]"
@@ -85,12 +98,12 @@ export default function Navbar() {
                   {/* User dropdown menu */}
                   {isDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-64 rounded-lg bg-white shadow-lg border border-gray-100 z-50 p-2">
-                      <Link 
-                      to={'/profile'}
-                      >
+                      <Link to={"/profile"}>
                         <div className="px-4 pb-2 mb-1 border-b border-gray-100 hover:bg-[#C6255310] hover:text-[#C62553] rounded-lg">
                           <div className="font-medium">Account</div>
-                          <div className="text-sm text-gray-500">rifatbdcallingit23@gmail.com</div>
+                          <div className="text-sm text-gray-500">
+                            rifatbdcallingit23@gmail.com
+                          </div>
                         </div>
                       </Link>
 
@@ -116,8 +129,12 @@ export default function Navbar() {
                         <Link>
                           <div className="px-4 py-2 hover:bg-[#C6255310] hover:text-[#C62553] rounded-l">
                             <div className="flex items-center gap-3">
-                              <button className="bg-[#C62553] text-white text-sm px-3 py-1 rounded-full">Upgrade</button>
-                              <span className="text-gray-700">Manage subscription</span>
+                              <button className="bg-[#C62553] text-white text-sm px-3 py-1 rounded-full">
+                                Upgrade
+                              </button>
+                              <span className="text-gray-700">
+                                Manage subscription
+                              </span>
                             </div>
                           </div>
                         </Link>
@@ -138,10 +155,16 @@ export default function Navbar() {
               </>
             ) : (
               <>
-                <button onClick={handleLogin} className="text-gray-700 hover:text-[#C62553] text-sm font-bold">
+                <button
+                  onClick={handleLogin}
+                  className="text-gray-700 hover:text-[#C62553] text-sm font-bold"
+                >
                   Log in
                 </button>
-                <Link to="/signup" className="rounded-full bg-[#C62553] px-6 py-[9px] text-white hover:bg-[#B01F48]">
+                <Link
+                  to="/signup"
+                  className="rounded-full bg-[#C62553] px-6 py-[9px] text-white hover:bg-[#B01F48]"
+                >
                   Sign up
                 </Link>
               </>
@@ -150,15 +173,85 @@ export default function Navbar() {
 
           {/* Mobile menu button */}
           <div className="flex items-center gap-12 md:hidden">
-            <button className="text-gray-700 md:hidden" onClick={toggleMenu} aria-label="Toggle menu">
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            <button
+              className="text-gray-700 md:hidden"
+              onClick={toggleMenu}
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? (
+                <Menu className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </button>
 
-            {isLoggedIn && (
-              <div className="h-8 w-8 rounded-full bg-[#C6255315] flex items-center justify-center text-[#C62553]">
-                R
-              </div>
-            )}
+            {/* this dropdown for mobile user */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-700 hover:bg-[#C6255310]"
+                onClick={toggleDropdown}
+                aria-label="User profile"
+              >
+                <User className="h-5 w-5 text-[#C62553]" />
+              </button>
+
+              {/* User dropdown menu */}
+              {isDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-64 rounded-lg bg-white shadow-lg border border-gray-100 z-50 p-2">
+                  <Link to={"/profile"}>
+                    <div className="px-4 pb-2 mb-1 border-b border-gray-100 hover:bg-[#C6255310] hover:text-[#C62553] rounded-lg">
+                      <div className="font-medium">Account</div>
+                      <div className="text-sm text-gray-500">
+                        rifatbdcallingit23@gmail.com
+                      </div>
+                    </div>
+                  </Link>
+
+                  <div className="py-1">
+                    <Link
+                      to="/dashboard"
+                      className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-[#C6255310] hover:text-[#C62553] rounded-lg"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      <LayoutDashboard className="h-5 w-5 text-[#C62553]" />
+                      <span>Dashboard</span>
+                    </Link>
+
+                    <Link
+                      to="/new-relationship"
+                      className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-[#C6255310] hover:text-[#C62553] rounded-lg"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      <User className="h-5 w-5 text-[#C62553]" />
+                      <span>New Relationship</span>
+                    </Link>
+
+                    <Link>
+                      <div className="px-4 py-2 hover:bg-[#C6255310] hover:text-[#C62553] rounded-l">
+                        <div className="flex items-center gap-3">
+                          <button className="bg-[#C62553] text-white text-sm px-3 py-1 rounded-full">
+                            Upgrade
+                          </button>
+                          <span className="text-gray-700">
+                            Manage subscription
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  </div>
+
+                  <div className="pt-1 border-t border-gray-100 mt-1">
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-[#C6255310] hover:text-[#C62553] w-full text-left"
+                    >
+                      <LogOut className="h-5 w-5 text-[#C62553]" />
+                      <span>Log out</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </nav>
@@ -184,11 +277,17 @@ export default function Navbar() {
         }}
       >
         <div className="flex justify-between items-center p-4 border-b border-gray-100">
-          <Link to="/" className="flex items-center gap-2 text-xl font-semibold text-[#C62553]">
+          <Link
+            to="/"
+            className="flex items-center gap-2 text-xl font-semibold text-[#C62553]"
+          >
             <Heart className="h-5 w-5 fill-[#C62553]" />
             <span>HeartBridge</span>
           </Link>
-          <button onClick={toggleMenu} className="text-gray-400 hover:text-gray-600">
+          <button
+            onClick={toggleMenu}
+            className="text-gray-400 hover:text-gray-600"
+          >
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -225,6 +324,5 @@ export default function Navbar() {
         </div>
       </div>
     </>
-  )
+  );
 }
-
