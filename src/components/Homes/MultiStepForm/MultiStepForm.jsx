@@ -104,7 +104,7 @@ const MultiStepForm = () => {
                 handleNextStep={handleNextStep}
                 handlePreviousStep={handlePreviousStep}
                 data={formData}
-                handleSubmitForm={onSubmit}
+                // handleSubmitForm={onSubmit}
               />
             )}
           </form>

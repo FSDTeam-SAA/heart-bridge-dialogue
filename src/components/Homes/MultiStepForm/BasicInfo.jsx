@@ -76,7 +76,7 @@ const BasicInfo = ({ handleNextStep }) => {
     formState: { errors },
   } = useFormContext();
   return (
-    <div className="bg-white w-4/5 mx-auto">
+    <div className="bg-white w-full md:w-4/5 mx-auto pb-8">
       <h2 className="text-3xl font-bold leading-[36px] text-[#c02351] text-center">
         Relationship Details
       </h2>
