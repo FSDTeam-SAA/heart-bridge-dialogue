@@ -1,22 +1,17 @@
-import React from 'react';
-import AccountSidebar from './AccountSidebar';
-import { Outlet } from 'react-router-dom';
+import { Outlet } from "react-router-dom"
+import AccountSidebar from "./AccountSidebar"
 
-function Account() {
+export default function Account() {
   return (
-    <div className="min-h-screen py-8">
-      <div className="container mx-auto bg-white rounded-lg shadow overflow-hidden">
-        <div className="md:flex">
-          <div className="w-full md:w-1/4 p-4">
-            <AccountSidebar />
-          </div>
-          <div className="w-full md:w-3/4 p-6">
-            <Outlet /> {/* Content of the active sub-route will be rendered here */}
-          </div>
-        </div>
+    <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <h1 className="text-2xl font-bold text-pink-600 mb-6">Account Settings</h1>
+      <div className="flex flex-col md:flex-row gap-6">
+        <AccountSidebar />
+        <main className="flex-1">
+          <Outlet />
+        </main>
       </div>
     </div>
-  );
+  )
 }
 
-export default Account;
