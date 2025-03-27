@@ -50,10 +50,6 @@ export default function Navbar() {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-  };
-
   const handleLogout = () => {
     setIsLoggedIn(false);
     setIsMenuOpen(false);
@@ -118,7 +114,7 @@ export default function Navbar() {
                         </Link>
 
                         <Link
-                          to="/new-relationship"
+                          to="/"
                           className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-[#C6255310] hover:text-[#C62553] rounded-lg"
                           onClick={() => setIsDropdownOpen(false)}
                         >
@@ -126,7 +122,10 @@ export default function Navbar() {
                           <span>New Relationship</span>
                         </Link>
 
-                        <Link>
+                        <Link 
+                        to={'/upgrade'}
+                        onClick={() => setIsDropdownOpen(false)}
+                        >
                           <div className="px-4 py-2 hover:bg-[#C6255310] hover:text-[#C62553] rounded-l">
                             <div className="flex items-center gap-3">
                               <button className="bg-[#C62553] text-white text-sm px-3 py-1 rounded-full">
@@ -155,12 +154,13 @@ export default function Navbar() {
               </>
             ) : (
               <>
+                <Link to="/login">
                 <button
-                  onClick={handleLogin}
                   className="text-gray-700 hover:text-[#C62553] text-sm font-bold"
                 >
                   Log in
                 </button>
+                </Link>
                 <Link
                   to="/signup"
                   className="rounded-full bg-[#C62553] px-6 py-[9px] text-white hover:bg-[#B01F48]"

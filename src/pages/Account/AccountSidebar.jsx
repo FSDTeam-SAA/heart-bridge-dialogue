@@ -1,35 +1,53 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
+"use client"
 
-function AccountSidebar() {
+import { NavLink, useNavigate } from "react-router-dom"
+import { User, CreditCard } from "lucide-react"
+
+export default function AccountSidebar() {
+  const navigate = useNavigate()
+
+  const handleSignOut = () => {
+    // Handle sign out logic here
+    console.log("Signing out...")
+    // Redirect to login page or home page after sign out
+    // navigate("/login");
+  }
+
   return (
-    <div className="flex flex-col space-y-2">
-      <h2 className="text-xl font-semibold text-gray-700 mb-4">Account Settings</h2>
-      <NavLink
-        to="/account"
-        className={({ isActive }) =>
-          `px-4 py-2 rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-800 ${
-            isActive ? 'bg-pink-100 text-pink-700 font-semibold' : ''
-          }`
-        }
-      >
-        Profile
-      </NavLink>
-      <NavLink
-        to="/account/subscription"
-        className={({ isActive }) =>
-          `px-4 py-2 rounded-md text-gray-600 hover:bg-gray-100 hover:text-gray-800 ${
-            isActive ? 'bg-pink-100 text-pink-700 font-semibold' : ''
-          }`
-        }
-      >
-        Subscription
-      </NavLink>
-      <button className="mt-4 bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 font-medium py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-1">
-        Sign Out
-      </button>
+    <div className="w-full md:w-64 border rounded-lg p-4 h-52">
+      <nav className="flex flex-col space-y-1">
+        <NavLink
+          to="/account/profile"
+          className={({ isActive }) =>
+            `flex items-center px-4 py-2 rounded-md ${
+              isActive ? "bg-pink-50/80 text-pink-600 font-semibold" : "text-gray-500 font-semibold"
+            }`
+          }
+        >
+          <User className="mr-2 h-5 w-5" />
+          <span>Profile</span>
+        </NavLink>
+        <NavLink
+          to="/account/subscription"
+          className={({ isActive }) =>
+            `flex items-center px-4 py-2 rounded-md ${
+              isActive ? "bg-pink-50 text-pink-600 font-semibold" : "text-gray-500 font-semibold"
+            }`
+          }
+        >
+          <CreditCard className="mr-2 h-5 w-5" />
+          <span>Subscription</span>
+        </NavLink>
+      </nav>
+      <div className="mt-8">
+        <button
+          onClick={handleSignOut}
+          className="w-full border border-gray-300 text-pink-600 py-2 px-4 rounded-md hover:bg-pink-50 transition-colors"
+        >
+          Sign Out
+        </button>
+      </div>
     </div>
-  );
+  )
 }
 
-export default AccountSidebar;

@@ -19,7 +19,7 @@ const NoRelationship = () => {
       </p>
 
       <Link
-        to="/new-relationship"
+        to="/"
         className="bg-gradient-to-r from-pink-500 to-[#C62553] text-white font-medium py-2 px-6 rounded-full transition-colors"
       >
         Create Your First Relationship

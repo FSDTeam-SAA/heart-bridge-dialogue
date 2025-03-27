@@ -1,38 +1,44 @@
-const Profile = () => {
-    return (
+import { User } from "lucide-react"
+
+export default function Profile() {
+  // This could come from a user context or API call in a real app
+  const userProfile = {
+    email: "rifatbdcallingit23@gmail.com",
+    memberSince: "N/A",
+    plan: "Free Plan",
+  }
+
+  return (
+    <div className="bg-white rounded-lg p-6 border border-gray-100">
+      <div className="flex items-center gap-2 mb-2">
+        <User className="h-5 w-5 text-pink-600" />
+        <h2 className="text-xl font-semibold">Profile Information</h2>
+      </div>
+      <p className="text-gray-600 mb-6">Manage your account details and preferences</p>
+
       <div className="space-y-6">
-        <div className="border-b border-gray-200 pb-4">
-          <h2 className="text-xl font-bold text-gray-900">Profile Information</h2>
-          <p className="text-gray-500 mt-1">Manage your account details and preferences</p>
+        
+        <div className="flex md:flex-row flex-col  w-full gap-6">
+          <div className="md:w-1/2">
+            <h3 className="font-medium mb-2">Email Address</h3>
+            <div className="border rounded-md p-3 text-gray-500 cursor-not-allowed">{userProfile.email}</div>
+            <p className="text-sm text-gray-500 mt-1">Your email address cannot be changed</p>
+          </div>
+
+          <div className="md:w-1/2">
+            <h3 className="font-medium mb-2">Member Since</h3>
+            <div className="border rounded-md p-3 text-gray-500 cursor-not-allowed">{userProfile.memberSince}</div>
+          </div>
         </div>
-  
-        <div className="space-y-6">
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-500">Email Address</h3>
-            <div className="mt-1 flex items-center">
-              <a 
-                href="mailto:rifatbdcailing123@gmail.com" 
-                className="text-blue-600 hover:text-blue-800 hover:underline"
-              >
-                rifatbdcailing123@gmail.com
-              </a>
-              <span className="ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-800 rounded-full">Verified</span>
-            </div>
-            <p className="mt-1 text-xs text-gray-500">Your email address cannot be changed</p>
-          </div>
-  
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-500">Current Plan</h3>
-            <p className="mt-1 text-gray-900">Free Plan</p>
-          </div>
-  
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="text-sm font-medium text-gray-500">Member Since</h3>
-            <p className="mt-1 text-gray-900">N/A</p>
+
+        <div>
+          <h3 className="font-medium mb-2">Current Plan</h3>
+          <div className="inline-block bg-pink-100 text-pink-600 px-3 py-1 rounded-full text-sm">
+            {userProfile.plan}
           </div>
         </div>
       </div>
-    );
-  };
-  
-  export default Profile;
+    </div>
+  )
+}
+
