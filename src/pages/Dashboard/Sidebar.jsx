@@ -20,7 +20,7 @@ const Sidebar = () => {
         <div className="px-4 py-3">
           <h2 className="text-gray-600 text-sm">Relationships</h2>
           <Link
-            to="/new-relationship"
+            to="/"
             className="flex items-center mt-2 text-pink-500 hover:bg-pink-50 px-2 py-1 rounded hover:text-black font-semibold"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -48,7 +48,7 @@ const Sidebar = () => {
             <h1>Name</h1>
         </div>
 
-        <Link>
+        <Link to={'/account'}>
             <div className="text-sm truncate py-2 px-3 rounded-lg hover:text-pink-600 hover:bg-pink-100 transition font-semibold">Account</div>
         </Link>
       </div>
