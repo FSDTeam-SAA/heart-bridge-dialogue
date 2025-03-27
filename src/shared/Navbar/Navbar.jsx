@@ -50,10 +50,6 @@ export default function Navbar() {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-  };
-
   const handleLogout = () => {
     setIsLoggedIn(false);
     setIsMenuOpen(false);
@@ -158,12 +154,13 @@ export default function Navbar() {
               </>
             ) : (
               <>
+                <Link to="/login">
                 <button
-                  onClick={handleLogin}
                   className="text-gray-700 hover:text-[#C62553] text-sm font-bold"
                 >
                   Log in
                 </button>
+                </Link>
                 <Link
                   to="/signup"
                   className="rounded-full bg-[#C62553] px-6 py-[9px] text-white hover:bg-[#B01F48]"
