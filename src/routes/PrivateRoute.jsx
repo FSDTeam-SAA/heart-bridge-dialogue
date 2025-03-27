@@ -7,18 +7,16 @@ import { useEffect, useState } from "react";
 const PrivateRoute = ({children}) => {
 
     const [user, setUser] = useState({});
-    const [loading, setLoading] = useState(null);
+    const [loading, setLoading] = useState(false);
     const location = useLocation();
 
     useEffect(() => {
-        setLoading(true);
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
           setUser(currentUser);
           setLoading(false);
         });
         return () => unsubscribe();
     }, []);
-
 
     if(loading) return <div className="min-h-screen flex flex-col justify-center items-center"><h1 className="text-3xl font-bold text-pink-500">Loading...</h1></div>
     

@@ -7,10 +7,15 @@ import { useEffect, useState } from "react";
 const PublicRoute = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [emailVerified, setEmailVerified] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      if (currentUser) {
+        setEmailVerified(currentUser.emailVerified);
+      }
       setLoading(false);
     });
     return () => unsubscribe();
@@ -24,7 +29,17 @@ const PublicRoute = ({ children }) => {
     );
 
   if (user) {
-    return <Navigate to="/" replace />;
+    if (emailVerified) {
+      return <Navigate to="/" replace />;
+    } else {
+      return (
+        <div className="min-h-screen flex flex-col justify-center items-center">
+          <h1 className="text-xl text-red-500">
+            Please verify your email address before logging in.
+          </h1>
+        </div>
+      );
+    }
   }
 
   return children;
