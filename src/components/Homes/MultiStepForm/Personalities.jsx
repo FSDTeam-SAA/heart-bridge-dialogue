@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { FaArrowRight } from "react-icons/fa6";
 
-const Personalities = ({ handlePreviousStep }) => {
+const Personalities = ({ handlePreviousStep, handleNextStep }) => {
   const {
     register,
     formState: { errors },
@@ -122,7 +122,7 @@ const Personalities = ({ handlePreviousStep }) => {
     },
   ];
   return (
-    <div className="w-4/5 mx-auto">
+    <div className="w-full md:w-4/5 mx-auto pb-10">
       <h2 className="text-3xl font-bold leading-[36px] text-[#c02351] text-center">
         Personality details
       </h2>
@@ -134,8 +134,9 @@ const Personalities = ({ handlePreviousStep }) => {
         {/* first part  */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 my-5">
           <div className="col-span-1">
+            <h5 className="text-lg font-medium leading-[16px] text-[#09090b] pb-4">Yetta Holmes</h5>
             <label
-              className="text-lg font-medium leading-normal text-black"
+              className="text-base font-medium leading-normal text-black"
               htmlFor="loveLanguage1"
             >
               Love Language <span className="text-red-500">*</span>
@@ -161,8 +162,9 @@ const Personalities = ({ handlePreviousStep }) => {
             )}
           </div>
           <div className="col-span-1">
+          <h5 className="text-lg font-medium leading-[16px] text-[#09090b] pb-4">Wyatt Caldwell</h5>
             <label
-              className="text-lg font-medium leading-normal text-black"
+              className="text-base font-medium leading-normal text-black"
               htmlFor="loveLanguage2"
             >
               Love Language <span className="text-red-500">*</span>
@@ -192,7 +194,7 @@ const Personalities = ({ handlePreviousStep }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 my-5">
           <div className="col-span-1">
             <label
-              className="text-lg font-medium leading-normal text-black"
+              className="text-base font-medium leading-normal text-black"
               htmlFor="communicationStyle1"
             >
               Communication Style <span className="text-red-500">*</span>
@@ -219,7 +221,7 @@ const Personalities = ({ handlePreviousStep }) => {
           </div>
           <div className="col-span-1">
             <label
-              className="text-lg font-medium leading-normal text-black"
+              className="text-base font-medium leading-normal text-black"
               htmlFor="communicationStyle2"
             >
               Communication Style <span className="text-red-500">*</span>
@@ -249,7 +251,7 @@ const Personalities = ({ handlePreviousStep }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 my-5">
           <div className="col-span-1">
             <label
-              className="text-lg font-medium leading-normal text-black"
+              className="text-base font-medium leading-normal text-black"
               htmlFor="conflictStyle1"
             >
               Conflict Style <span className="text-red-500">*</span>
@@ -276,7 +278,7 @@ const Personalities = ({ handlePreviousStep }) => {
           </div>
           <div className="col-span-1">
             <label
-              className="text-lg font-medium leading-normal text-black"
+              className="text-base font-medium leading-normal text-black"
               htmlFor="conflictStyle2"
             >
               Conflict Style <span className="text-red-500">*</span>
@@ -306,7 +308,7 @@ const Personalities = ({ handlePreviousStep }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 my-5">
           <div className="col-span-1">
             <label
-              className="text-lg font-medium leading-normal text-black"
+              className="text-base font-medium leading-normal text-black"
               htmlFor="attachmentStyle1"
             >
               Attachment Style <span className="text-red-500">*</span>
@@ -333,7 +335,7 @@ const Personalities = ({ handlePreviousStep }) => {
           </div>
           <div className="col-span-1">
             <label
-              className="text-lg font-medium leading-normal text-black"
+              className="text-base font-medium leading-normal text-black"
               htmlFor="attachmentStyle2"
             >
               Attachment Style <span className="text-red-500">*</span>
@@ -371,7 +373,8 @@ const Personalities = ({ handlePreviousStep }) => {
           Back
         </button>
         <button
-          type="submit"
+          type="button"
+          onClick={handleNextStep}
           className="bg-rose-500 flex items-center gap-2 text-white py-2 px-5 rounded-lg text-base font-semibold leading-normal"
         >
           Get Started <FaArrowRight className="mt-1" />
