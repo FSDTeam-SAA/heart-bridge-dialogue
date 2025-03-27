@@ -6,7 +6,7 @@ import { useState } from "react";
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state || '/';
+  const from = location.state || "/";
 
   const [loginData, setLoginData] = useState({
     email: "",
@@ -22,6 +22,66 @@ export default function Login() {
     });
     setError("");
   };
+
+  // const handleLogin = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   setError("");
+
+  //   if (!loginData.email || !loginData.password) {
+  //     setError("Please fill in all fields");
+  //     setLoading(false);
+  //     return;
+  //   }
+
+  //   try {
+  //     const userCredential = await signInWithEmailAndPassword(
+  //       auth,
+  //       loginData.email,
+  //       loginData.password
+  //     );
+
+  //     const user = userCredential.user;
+
+  //     if (!user.emailVerified) {
+  //       setError("Please verify your email before logging in.");
+  //       await signOut(auth);
+  //       setLoading(false);
+  //       return;
+  //     }
+
+  //     localStorage.setItem(
+  //       "user",
+  //       JSON.stringify({
+  //         uid: user.uid,
+  //         email: user.email,
+  //         displayName: user.displayName,
+  //       })
+  //     );
+
+  //     navigate(from);
+  //   } catch (error) {
+  //     let errorMessage = "Login failed. Please try again.";
+  //     switch (error.code) {
+  //       case "auth/invalid-credential":
+  //       case "auth/wrong-password":
+  //         errorMessage = "Invalid email or password";
+  //         break;
+  //       case "auth/user-not-found":
+  //         errorMessage = "User not found";
+  //         break;
+  //       case "auth/too-many-requests":
+  //         errorMessage = "Too many attempts. Try again later";
+  //         break;
+  //       case "auth/network-request-failed":
+  //         errorMessage = "Network error. Check your connection";
+  //         break;
+  //     }
+  //     setError(errorMessage);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -44,8 +104,18 @@ export default function Login() {
       const user = userCredential.user;
 
       if (!user.emailVerified) {
-        setError("Please verify your email before logging in.");
-        await signOut(auth); // Unverified user logout kore deoa
+        try {
+          await sendEmailVerification(user);
+          await signOut(auth);
+          setError(
+            "Verification email resent. Please verify your email before logging in."
+          );
+        } catch (verificationError) {
+          console.error("Resend verification error:", verificationError);
+          setError(
+            "Failed to resend verification email. Please try again later."
+          );
+        }
         setLoading(false);
         return;
       }
@@ -76,13 +146,15 @@ export default function Login() {
         case "auth/network-request-failed":
           errorMessage = "Network error. Check your connection";
           break;
+        case "auth/user-disabled":
+          errorMessage = "Account disabled. Contact support";
+          break;
       }
       setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <div className="flex min-h-[calc(100vh-66px)] items-center justify-center">
       <div className="w-full max-w-md bg-white p-6 rounded-2xl shadow-md">

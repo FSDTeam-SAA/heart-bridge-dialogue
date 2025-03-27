@@ -52,6 +52,66 @@ export default function SignUp() {
     }
   };
 
+  // const handleSignUp = async (e) => {
+  //   e.preventDefault();
+  //   if (!validateForm()) return;
+
+  //   setLoading(true);
+  //   setErrors({});
+  //   setSuccessMessage("");
+
+  //   try {
+  //     const userCredential = await createUserWithEmailAndPassword(
+  //       auth,
+  //       registerData.email,
+  //       registerData.password
+  //     );
+
+  //     await sendEmailVerification(auth.currentUser);
+
+  //     await updateProfile(auth.currentUser, {
+  //       displayName: registerData.fullName,
+  //     });
+
+  //     await signOut(auth);
+
+  //     await set(ref(db, "users/" + userCredential.user.uid), {
+  //       fullname: registerData.fullName,
+  //       email: registerData.email,
+  //       emailVerified: false,
+  //       createdAt: new Date().toISOString(),
+  //     });
+
+  //     setSuccessMessage(
+  //       "Registration successful! Please check your email to verify your account."
+  //     );
+  //     navigate("/login");
+  //     setRegisterData({ fullName: "", email: "", password: "" });
+  //   } catch (error) {
+  //     let errorMessage = "Registration failed. Please try again.";
+  //     switch (error.code) {
+  //       case "auth/email-already-in-use":
+  //         errorMessage = "Email is already in use.";
+  //         break;
+  //       case "auth/invalid-email":
+  //         errorMessage = "Invalid email address.";
+  //         break;
+  //       case "auth/weak-password":
+  //         errorMessage = "Password should be at least 6 characters.";
+  //         break;
+  //       case "auth/network-request-failed":
+  //         errorMessage =
+  //           "Network error. Please check your internet connection.";
+  //         break;
+  //       default:
+  //         break;
+  //     }
+  //     setErrors({ general: errorMessage });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleSignUp = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -67,13 +127,11 @@ export default function SignUp() {
         registerData.password
       );
 
-      await sendEmailVerification(auth.currentUser);
-
       await updateProfile(auth.currentUser, {
         displayName: registerData.fullName,
       });
 
-      await signOut(auth);
+      await sendEmailVerification(auth.currentUser);
 
       await set(ref(db, "users/" + userCredential.user.uid), {
         fullname: registerData.fullName,
@@ -82,28 +140,31 @@ export default function SignUp() {
         createdAt: new Date().toISOString(),
       });
 
+      await signOut(auth);
+
       setSuccessMessage(
-        "Registration successful! Please check your email to verify your account."
+        `Registration successful! Verification email sent to ${registerData.email}. 
+        Please verify your email before logging in.`
       );
-      navigate("/login");
+
       setRegisterData({ fullName: "", email: "", password: "" });
     } catch (error) {
       let errorMessage = "Registration failed. Please try again.";
       switch (error.code) {
         case "auth/email-already-in-use":
-          errorMessage = "Email is already in use.";
+          errorMessage = "Email is already in use. Try logging in instead.";
           break;
         case "auth/invalid-email":
-          errorMessage = "Invalid email address.";
+          errorMessage = "Invalid email address format.";
           break;
         case "auth/weak-password":
-          errorMessage = "Password should be at least 6 characters.";
+          errorMessage = "Password must be at least 6 characters.";
           break;
         case "auth/network-request-failed":
-          errorMessage =
-            "Network error. Please check your internet connection.";
+          errorMessage = "Network error. Check your internet connection.";
           break;
-        default:
+        case "auth/too-many-requests":
+          errorMessage = "Too many attempts. Try again later.";
           break;
       }
       setErrors({ general: errorMessage });
