@@ -9,10 +9,12 @@ import {
   LogOut,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { auth } from "../../config/firebaseConfig";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -50,10 +52,21 @@ export default function Navbar() {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setIsMenuOpen(false);
-    setIsDropdownOpen(false);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setIsMenuOpen(false);
+      setIsDropdownOpen(false);
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
   };
 
   return (
@@ -71,7 +84,7 @@ export default function Navbar() {
 
           {/* Desktop navigation */}
           <div className="hidden items-center gap-7 md:flex">
-            {isLoggedIn ? (
+            {user ? (
               <>
                 <Link
                   to="/upgrade"
@@ -122,9 +135,9 @@ export default function Navbar() {
                           <span>New Relationship</span>
                         </Link>
 
-                        <Link 
-                        to={'/upgrade'}
-                        onClick={() => setIsDropdownOpen(false)}
+                        <Link
+                          to={"/upgrade"}
+                          onClick={() => setIsDropdownOpen(false)}
                         >
                           <div className="px-4 py-2 hover:bg-[#C6255310] hover:text-[#C62553] rounded-l">
                             <div className="flex items-center gap-3">
@@ -155,11 +168,9 @@ export default function Navbar() {
             ) : (
               <>
                 <Link to="/login">
-                <button
-                  className="text-gray-700 hover:text-[#C62553] text-sm font-bold"
-                >
-                  Log in
-                </button>
+                  <button className="text-gray-700 hover:text-[#C62553] text-sm font-bold">
+                    Log in
+                  </button>
                 </Link>
                 <Link
                   to="/signup"
@@ -172,87 +183,103 @@ export default function Navbar() {
           </div>
 
           {/* Mobile menu button */}
-          <div className="flex items-center gap-12 md:hidden">
-            <button
-              className="text-gray-700 md:hidden"
-              onClick={toggleMenu}
-              aria-label="Toggle menu"
-            >
-              {isMenuOpen ? (
-                <Menu className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
-            </button>
-
-            {/* this dropdown for mobile user */}
-            <div className="relative" ref={dropdownRef}>
+          {user ? (
+            <div className="flex items-center gap-12 md:hidden">
               <button
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-700 hover:bg-[#C6255310]"
-                onClick={toggleDropdown}
-                aria-label="User profile"
+                className="text-gray-700 md:hidden"
+                onClick={toggleMenu}
+                aria-label="Toggle menu"
               >
-                <User className="h-5 w-5 text-[#C62553]" />
+                {isMenuOpen ? (
+                  <Menu className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
               </button>
 
-              {/* User dropdown menu */}
-              {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-64 rounded-lg bg-white shadow-lg border border-gray-100 z-50 p-2">
-                  <Link to={"/account"}>
-                    <div className="px-4 pb-2 mb-1 border-b border-gray-100 hover:bg-[#C6255310] hover:text-[#C62553] rounded-lg">
-                      <div className="font-medium">Account</div>
-                      <div className="text-sm text-gray-500">
-                        rifatbdcallingit23@gmail.com
-                      </div>
-                    </div>
-                  </Link>
+              {/* this dropdown for mobile user */}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-700 hover:bg-[#C6255310]"
+                  onClick={toggleDropdown}
+                  aria-label="User profile"
+                >
+                  <User className="h-5 w-5 text-[#C62553]" />
+                </button>
 
-                  <div className="py-1">
-                    <Link
-                      to="/dashboard"
-                      className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-[#C6255310] hover:text-[#C62553] rounded-lg"
-                      onClick={() => setIsDropdownOpen(false)}
-                    >
-                      <LayoutDashboard className="h-5 w-5 text-[#C62553]" />
-                      <span>Dashboard</span>
-                    </Link>
-
-                    <Link
-                      to="/new-relationship"
-                      className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-[#C6255310] hover:text-[#C62553] rounded-lg"
-                      onClick={() => setIsDropdownOpen(false)}
-                    >
-                      <User className="h-5 w-5 text-[#C62553]" />
-                      <span>New Relationship</span>
-                    </Link>
-
-                    <Link>
-                      <div className="px-4 py-2 hover:bg-[#C6255310] hover:text-[#C62553] rounded-l">
-                        <div className="flex items-center gap-3">
-                          <button className="bg-[#C62553] text-white text-sm px-3 py-1 rounded-full">
-                            Upgrade
-                          </button>
-                          <span className="text-gray-700">
-                            Manage subscription
-                          </span>
+                {/* User dropdown menu */}
+                {isDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-64 rounded-lg bg-white shadow-lg border border-gray-100 z-50 p-2">
+                    <Link to={"/account"}>
+                      <div className="px-4 pb-2 mb-1 border-b border-gray-100 hover:bg-[#C6255310] hover:text-[#C62553] rounded-lg">
+                        <div className="font-medium">Account</div>
+                        <div className="text-sm text-gray-500">
+                          rifatbdcallingit23@gmail.com
                         </div>
                       </div>
                     </Link>
-                  </div>
 
-                  <div className="pt-1 border-t border-gray-100 mt-1">
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-[#C6255310] hover:text-[#C62553] w-full text-left"
-                    >
-                      <LogOut className="h-5 w-5 text-[#C62553]" />
-                      <span>Log out</span>
-                    </button>
+                    <div className="py-1">
+                      <Link
+                        to="/dashboard"
+                        className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-[#C6255310] hover:text-[#C62553] rounded-lg"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        <LayoutDashboard className="h-5 w-5 text-[#C62553]" />
+                        <span>Dashboard</span>
+                      </Link>
+
+                      <Link
+                        to="/new-relationship"
+                        className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-[#C6255310] hover:text-[#C62553] rounded-lg"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        <User className="h-5 w-5 text-[#C62553]" />
+                        <span>New Relationship</span>
+                      </Link>
+
+                      <Link>
+                        <div className="px-4 py-2 hover:bg-[#C6255310] hover:text-[#C62553] rounded-l">
+                          <div className="flex items-center gap-3">
+                            <button className="bg-[#C62553] text-white text-sm px-3 py-1 rounded-full">
+                              Upgrade
+                            </button>
+                            <span className="text-gray-700">
+                              Manage subscription
+                            </span>
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
+
+                    <div className="pt-1 border-t border-gray-100 mt-1">
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-[#C6255310] hover:text-[#C62553] w-full text-left"
+                      >
+                        <LogOut className="h-5 w-5 text-[#C62553]" />
+                        <span>Log out</span>
+                      </button>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
+          ) : (
+            <>
+              <Link to="/login">
+                <button className="text-gray-700 hover:text-[#C62553] text-sm font-bold">
+                  Log in
+                </button>
+              </Link>
+              <Link
+                to="/signup"
+                className="rounded-full bg-[#C62553] px-6 py-[9px] text-white hover:bg-[#B01F48]"
+              >
+                Sign up
+              </Link>
+            </>
+          )}
         </div>
       </nav>
 
