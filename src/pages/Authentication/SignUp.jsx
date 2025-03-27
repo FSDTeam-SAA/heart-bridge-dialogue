@@ -1,120 +1,4 @@
-// import { Link } from "react-router-dom";
-// import {
-//   createUserWithEmailAndPassword,
-//   sendEmailVerification,
-//   updateProfile,
-// } from "firebase/auth";
-// import { auth, db } from "../../config/firebaseConfig";
-// import { ref, set } from "firebase/database";
-// import { useState } from "react";
-
-// export default function SignUp() {
-//   const [registerData, setRegisterData] = useState({
-//     fullName: "",
-//     email: "",
-//     password: "",
-//   });
-
-//   const handleInput = (e) => {
-//     const inputInfo = { ...registerData };
-//     inputInfo[e.target.name] = e.target.value;
-//     setRegisterData(inputInfo);
-//   };
-
-//   const handleSignUp = async (e) => {
-//     e.preventDefault();
-//     try {
-//       const userData = await createUserWithEmailAndPassword(
-//         auth,
-//         registerData.email,
-//         registerData.password
-//       );
-//       await sendEmailVerification(auth.currentUser);
-
-//       await updateProfile(auth.currentUser, {
-//         displayName: registerData.fullName,
-//       });
-
-//       set(ref(db, "users/" + userData.user.uid), {
-//         fullname: userData.user.displayName,
-//         email: userData.user.email,
-//       });
-//     } catch (error) {
-//       console.error("Error during user creation:", error);
-//       throw error;
-//     }
-//   };
-
-//   return (
-//     <div className="flex min-h-[calc(100vh-66px)] items-center justify-center">
-//       <div className="w-full max-w-md bg-white p-6 rounded-2xl shadow-md">
-//         <h2 className="text-2xl font-bold text-center">Create an account</h2>
-//         <p className="text-gray-500 font-medium text-center mb-6 mt-3">
-//           Enter your email below to create your account
-//         </p>
-
-//         <form className="space-y-4">
-//           <div>
-//             <label className="block text-sm font-medium text-gray-700">
-//               Name<span className="text-red-500">*</span>
-//             </label>
-//             <input
-//               type="text"
-//               name="fullName"
-//               value={registerData.fullName}
-//               onChange={handleInput}
-//               placeholder="Enter your Full Name"
-//               className="w-full px-4 py-2 mt-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-//             />
-//           </div>
-//           <div>
-//             <label className="block text-sm font-medium text-gray-700">
-//               Email<span className="text-red-500">*</span>
-//             </label>
-//             <input
-//               type="email"
-//               name="email"
-//               value={registerData.email}
-//               onChange={handleInput}
-//               placeholder="Enter Your Email Address"
-//               className="w-full px-4 py-2 mt-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-//             />
-//           </div>
-//           <div>
-//             <label className="block text-sm font-medium text-gray-700">
-//               Password<span className="text-red-500">*</span>
-//             </label>
-//             <input
-//               type="password"
-//               name="password"
-//               value={registerData.password}
-//               onChange={handleInput}
-//               placeholder="Create a password"
-//               className="w-full px-4 py-2 mt-1 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500"
-//             />
-//           </div>
-
-//           <button
-//             type="submit"
-//             onClick={handleSignUp}
-//             className="w-full bg-pink-700 text-white py-2 rounded-md hover:bg-pink-700 transition"
-//           >
-//             Create account
-//           </button>
-//         </form>
-
-//         <p className="text-center text-sm text-gray-600 mt-4">
-//           Already have an account?{" "}
-//           <Link to="/login" className="text-pink-500 hover:underline">
-//             Log in
-//           </Link>
-//         </p>
-//       </div>
-//     </div>
-//   );
-// }
-
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
@@ -130,6 +14,7 @@ export default function SignUp() {
     email: "",
     password: "",
   });
+  const navigate = useNavigate();
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -197,7 +82,7 @@ export default function SignUp() {
       setSuccessMessage(
         "Registration successful! Please check your email to verify your account."
       );
-      // Clear form
+      navigate("/login");
       setRegisterData({ fullName: "", email: "", password: "" });
     } catch (error) {
       let errorMessage = "Registration failed. Please try again.";

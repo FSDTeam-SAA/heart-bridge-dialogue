@@ -8,6 +8,8 @@ import Perspectives from "./Perspectives";
 import Personalities from "./Personalities";
 import ProgressStepper from "./progress-stepper";
 import AllInformation from "./AllInformation";
+import { db } from "../../../config/firebaseConfig";
+import { ref, set } from "firebase/database";
 
 const MultiStepForm = () => {
   const navigate = useNavigate();
@@ -15,8 +17,7 @@ const MultiStepForm = () => {
   const { trigger, watch, setValue, reset } = methods;
   const [currentStep, setCurrentStep] = useState(1);
 
-   // Load form data from localStorage on mount
-   useEffect(() => {
+  useEffect(() => {
     const savedData = localStorage.getItem("multiStepFormData");
     if (savedData) {
       const parsedData = JSON.parse(savedData);
@@ -28,8 +29,8 @@ const MultiStepForm = () => {
 
   const formData = watch();
 
-   // Save form data to localStorage
-   useEffect(() => {
+  // Save form data to localStorage
+  useEffect(() => {
     localStorage.setItem("multiStepFormData", JSON.stringify(formData));
   }, [formData]);
 
@@ -45,33 +46,61 @@ const MultiStepForm = () => {
     setCurrentStep((prevStep) => prevStep - 1);
   };
 
-  // Handle form submission
-  const onSubmit = (data) => {
-    console.log("Form Data Submitted:", data);
-    toast.success("Form submitted successfully!");
-    localStorage.removeItem("multiStepFormData"); // Clear storage on submit
-    reset();
+  const onSubmit = async (data) => {
+    // console.log("Form Data Submitted:", data);
+    // toast.success("Form submitted successfully!");
+    // localStorage.removeItem("multiStepFormData");
+    // reset();
 
-    // Navigate to the dashboard
-    setTimeout(() => {
-      navigate("/dashboard");
-    }, 1500);
+    // setTimeout(() => {
+    //   navigate("/dashboard");
+    // }, 1500);
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+
+      if (!user || !user.uid) {
+        toast.error("User not authenticated!");
+        return;
+      }
+
+      const formRef = ref(
+        db,
+        `users/${user.uid}/formSubmissions/${Date.now()}`
+      );
+
+      await set(formRef, {
+        ...data,
+        submittedAt: new Date().toISOString(),
+        status: "pending",
+      });
+
+      toast.success("Form submitted successfully!");
+      localStorage.removeItem("multiStepFormData");
+      reset();
+
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1500);
+    } catch (error) {
+      console.error("Submission error:", error);
+      toast.error("Failed to submit form. Please try again.");
+    }
   };
 
   return (
     <div className="container bg-white">
       {/* Toast Notifications */}
-      <ToastContainer position="top-center" autoClose={2000}/>
+      <ToastContainer position="top-center" autoClose={2000} />
       {/* navbar end  */}
       <FormProvider {...methods}>
         <div className="mt-8">
           <ProgressStepper
             currentStep={currentStep}
             steps={[
-                { id: 1, label: "Basic Info" },
-                { id: 2, label: "Perspectives" },
-                { id: 3, label: "Personalities" },
-                { id: 4, label: "Review & Submit" },
+              { id: 1, label: "Basic Info" },
+              { id: 2, label: "Perspectives" },
+              { id: 3, label: "Personalities" },
+              { id: 4, label: "Review & Submit" },
             ]}
           />
         </div>
