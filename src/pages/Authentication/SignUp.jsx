@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
+  signOut,
   updateProfile,
 } from "firebase/auth";
 import { auth, db } from "../../config/firebaseConfig";
@@ -71,6 +72,8 @@ export default function SignUp() {
       await updateProfile(auth.currentUser, {
         displayName: registerData.fullName,
       });
+
+      await signOut(auth);
 
       await set(ref(db, "users/" + userCredential.user.uid), {
         fullname: registerData.fullName,
