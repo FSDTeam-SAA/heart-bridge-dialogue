@@ -10,6 +10,8 @@ import Login from "../pages/Authentication/Login";
 import Account from "../pages/Account/Account";
 import Profile from "../pages/Account/Profile";
 import Subscription from "../pages/Account/Subscription";
+import PrivateRoute from "./PrivateRoute";
+import PublicRoute from "./PublicRoute";
 
 const router = createBrowserRouter([
     {
@@ -18,7 +20,7 @@ const router = createBrowserRouter([
         children : [
             {
                 path : "/",
-                element : <Home/>
+                element : <PrivateRoute><Home/></PrivateRoute>
             },
             {
                 path : "*",
@@ -26,19 +28,19 @@ const router = createBrowserRouter([
             },
             {
                 path : "upgrade",
-                element : <Upgrade />
+                element : <PrivateRoute><Upgrade /></PrivateRoute>
             },
             {
                 path : "/signup",
-                element : <SignUp />
+                element : <PublicRoute><SignUp /></PublicRoute>
             },
             {
                 path : "/login",
-                element : <Login />
+                element : <PublicRoute><Login /></PublicRoute>
             },
             {
                 path: '/account',
-                element: <Account />,
+                element: <PrivateRoute><Account /></PrivateRoute>,
                 children: [
                   {
                     index: true,
@@ -46,11 +48,11 @@ const router = createBrowserRouter([
                   },
                   {
                     path: 'profile',
-                    element: <Profile />,
+                    element: <PrivateRoute><Profile /></PrivateRoute>,
                   },
                   {
                     path: 'subscription',
-                    element: <Subscription />,
+                    element: <PrivateRoute><Subscription /></PrivateRoute>,
                   },
                 ],
             },
@@ -60,11 +62,11 @@ const router = createBrowserRouter([
 
     {
         path : "/dashboard",
-        element : <Dashboard />,
+        element : <PrivateRoute><Dashboard /></PrivateRoute>,
         children : [
             {
                 path : "/dashboard",
-                element : <NoRelationship/>
+                element : <PrivateRoute><NoRelationship/></PrivateRoute>
             }
         ]
     }

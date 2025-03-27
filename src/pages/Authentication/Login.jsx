@@ -1,11 +1,13 @@
-
-import { Link, useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { auth } from "../../config/firebaseConfig";
 import { useState } from "react";
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state || '/';
+
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
@@ -26,7 +28,6 @@ export default function Login() {
     setLoading(true);
     setError("");
 
-    // Basic validation
     if (!loginData.email || !loginData.password) {
       setError("Please fill in all fields");
       setLoading(false);
@@ -40,8 +41,15 @@ export default function Login() {
         loginData.password
       );
 
-      // Store user data in localStorage
       const user = userCredential.user;
+
+      if (!user.emailVerified) {
+        setError("Please verify your email before logging in.");
+        await signOut(auth); // Unverified user logout kore deoa
+        setLoading(false);
+        return;
+      }
+
       localStorage.setItem(
         "user",
         JSON.stringify({
@@ -51,8 +59,7 @@ export default function Login() {
         })
       );
 
-      // Redirect to dashboard or home page
-      navigate("/");
+      navigate(from);
     } catch (error) {
       let errorMessage = "Login failed. Please try again.";
       switch (error.code) {
