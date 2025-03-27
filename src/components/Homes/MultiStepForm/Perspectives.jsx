@@ -9,7 +9,7 @@ const Perspectives = ({ handleNextStep, handlePreviousStep }) => {
     formState: { errors },
   } = useFormContext();
   return (
-    <div className="bg-white w-4/5 mx-auto">
+    <div className="bg-white w-full md:w-4/5 mx-auto pb-10">
       <h2 className="text-3xl font-bold leading-[36px] text-[#c02351] text-center">
         Share your perspectives
       </h2>

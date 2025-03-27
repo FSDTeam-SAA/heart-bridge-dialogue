@@ -11,7 +11,7 @@ export default function ProgressStepper({ steps, currentStep = 1 }) {
           return (
             <React.Fragment key={step.id}>
               {/* Step Circle */}
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col md:flex-row justify-center items-center gap-3">
                 <div
                   className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium ${
                     isActive ? "bg-rose-500 text-white" : "bg-rose-200 text-gray-700"
