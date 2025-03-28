@@ -102,7 +102,7 @@ export default function Navbar() {
                         <div className="px-4 pb-2 mb-1 border-b hover:bg-[#C6255310] hover:text-[#C62553] rounded-lg">
                           <div className="font-medium">Account</div>
                           <div className="text-sm text-gray-500">
-                            rifatbdcallingit23@gmail.com
+                            {user?.email}
                           </div>
                         </div>
                       </Link>
@@ -205,7 +205,7 @@ export default function Navbar() {
               <div className="px-4 pb-2 mb-1 border-b hover:bg-[#C6255310] hover:text-[#C62553] rounded-lg">
                 <div className="font-medium">Account</div>
                 <div className="text-sm text-gray-500">
-                  rifatbdcallingit23@gmail.com
+                  {user?.email}
                 </div>
               </div>
             </Link>
