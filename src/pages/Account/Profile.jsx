@@ -5,6 +5,7 @@ import { auth } from "../../config/firebaseConfig";
 
 export default function Profile() {
 
+  
   const [user, setUser] = useState(null);
 
   useEffect(() => {
