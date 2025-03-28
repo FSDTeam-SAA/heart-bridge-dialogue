@@ -148,6 +148,7 @@ export default function SignUp() {
       );
 
       setRegisterData({ fullName: "", email: "", password: "" });
+      navigate("/login");
     } catch (error) {
       let errorMessage = "Registration failed. Please try again.";
       switch (error.code) {
