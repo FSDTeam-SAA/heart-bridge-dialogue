@@ -2,15 +2,15 @@
 
 import { NavLink, useNavigate } from "react-router-dom"
 import { User, CreditCard } from "lucide-react"
+import { signOut } from "firebase/auth"
+import { auth } from "../../config/firebaseConfig"
 
 export default function AccountSidebar() {
   const navigate = useNavigate()
 
-  const handleSignOut = () => {
-    // Handle sign out logic here
-    console.log("Signing out...")
-    // Redirect to login page or home page after sign out
-    // navigate("/login");
+  const handleSignOut = async() => {
+    await signOut(auth);
+    localStorage.removeItem("user");
   }
 
   return (
