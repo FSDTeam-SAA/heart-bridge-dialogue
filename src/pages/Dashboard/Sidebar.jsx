@@ -1,9 +1,21 @@
 import { Link, useLocation } from "react-router-dom"
 import { Heart, Plus } from "lucide-react"
 import ProgressBar from "@ramonak/react-progress-bar";
+import { useEffect, useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../config/firebaseConfig";
 
 const Sidebar = () => {
   const location = useLocation()
+
+  const [user, setUser] = useState(null);
+  
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+          setUser(currentUser);
+        });
+        return () => unsubscribe();
+    }, []);
 
   return (
     <aside className="border-r border-gray-200 flex flex-col bg-[#FAFAFA] h-full">
@@ -44,8 +56,8 @@ const Sidebar = () => {
       {/* User Account */}
       <div className="p-4 border-t border-gray-200 flex items-center justify-between">
         <div className="flex items-center gap-1">
-            <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center text-red-500 mr-3">R</div>
-            <h1>Name</h1>
+            <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center text-red-500 mr-3">  {user?.displayName?.charAt(0).toUpperCase()}</div>
+            <h1>{user?.displayName}</h1>
         </div>
 
         <Link to={'/account'}>
