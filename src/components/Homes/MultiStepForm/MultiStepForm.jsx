@@ -47,14 +47,6 @@ const MultiStepForm = () => {
   };
 
   const onSubmit = async (data) => {
-    // console.log("Form Data Submitted:", data);
-    // toast.success("Form submitted successfully!");
-    // localStorage.removeItem("multiStepFormData");
-    // reset();
-
-    // setTimeout(() => {
-    //   navigate("/dashboard");
-    // }, 1500);
     try {
       const user = JSON.parse(localStorage.getItem("user"));
 
