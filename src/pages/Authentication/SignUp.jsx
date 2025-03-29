@@ -258,12 +258,11 @@ export default function SignUp() {
           <div className=" w-full">
             <ReCAPTCHA
               ref={recaptchaRef}
-              sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" 
+              sitekey="6LfcZQMrAAAAAB02s3fmK-6YBS349kLCGmmC4eIg"
               onChange={handleCaptchaChange}
               onExpired={handleCaptchaExpired}
               onErrored={handleCaptchaError}
               onLoad={() => setCaptchaLoaded(true)}
-            
             />
           </div>
           {errors.captcha && (
