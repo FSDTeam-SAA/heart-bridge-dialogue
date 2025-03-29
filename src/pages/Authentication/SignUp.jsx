@@ -1,3 +1,5 @@
+"use client";
+
 import { Link, useNavigate } from "react-router-dom";
 import {
   createUserWithEmailAndPassword,
@@ -7,7 +9,8 @@ import {
 } from "firebase/auth";
 import { auth, db } from "../../config/firebaseConfig";
 import { ref, set } from "firebase/database";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
 
 export default function SignUp() {
   const [registerData, setRegisterData] = useState({
@@ -19,6 +22,27 @@ export default function SignUp() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [captchaVerified, setCaptchaVerified] = useState(false);
+  const [captchaLoaded, setCaptchaLoaded] = useState(false);
+  const recaptchaRef = useRef(null);
+
+  // Debug CAPTCHA loading
+  useEffect(() => {
+    // Add a global callback for when reCAPTCHA is ready
+    window.onRecaptchaLoaded = () => {
+      console.log("reCAPTCHA has loaded successfully");
+      setCaptchaLoaded(true);
+    };
+
+    // Add script to detect if reCAPTCHA fails to load
+    const checkRecaptchaLoading = setTimeout(() => {
+      if (!captchaLoaded) {
+        console.warn("reCAPTCHA might not have loaded properly");
+      }
+    }, 5000);
+
+    return () => clearTimeout(checkRecaptchaLoading);
+  }, [captchaLoaded]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -34,6 +58,9 @@ export default function SignUp() {
       newErrors.password = "Password is required";
     } else if (registerData.password.length < 6) {
       newErrors.password = "Password should be at least 6 characters";
+    }
+    if (!captchaVerified) {
+      newErrors.captcha = "Please verify you are not a robot";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -52,65 +79,29 @@ export default function SignUp() {
     }
   };
 
-  // const handleSignUp = async (e) => {
-  //   e.preventDefault();
-  //   if (!validateForm()) return;
+  const handleCaptchaChange = (value) => {
+    console.log("CAPTCHA verified:", !!value);
+    setCaptchaVerified(!!value);
+    if (errors.captcha) {
+      setErrors({
+        ...errors,
+        captcha: null,
+      });
+    }
+  };
 
-  //   setLoading(true);
-  //   setErrors({});
-  //   setSuccessMessage("");
+  const handleCaptchaExpired = () => {
+    console.log("CAPTCHA expired");
+    setCaptchaVerified(false);
+  };
 
-  //   try {
-  //     const userCredential = await createUserWithEmailAndPassword(
-  //       auth,
-  //       registerData.email,
-  //       registerData.password
-  //     );
-
-  //     await sendEmailVerification(auth.currentUser);
-
-  //     await updateProfile(auth.currentUser, {
-  //       displayName: registerData.fullName,
-  //     });
-
-  //     await signOut(auth);
-
-  //     await set(ref(db, "users/" + userCredential.user.uid), {
-  //       fullname: registerData.fullName,
-  //       email: registerData.email,
-  //       emailVerified: false,
-  //       createdAt: new Date().toISOString(),
-  //     });
-
-  //     setSuccessMessage(
-  //       "Registration successful! Please check your email to verify your account."
-  //     );
-  //     navigate("/login");
-  //     setRegisterData({ fullName: "", email: "", password: "" });
-  //   } catch (error) {
-  //     let errorMessage = "Registration failed. Please try again.";
-  //     switch (error.code) {
-  //       case "auth/email-already-in-use":
-  //         errorMessage = "Email is already in use.";
-  //         break;
-  //       case "auth/invalid-email":
-  //         errorMessage = "Invalid email address.";
-  //         break;
-  //       case "auth/weak-password":
-  //         errorMessage = "Password should be at least 6 characters.";
-  //         break;
-  //       case "auth/network-request-failed":
-  //         errorMessage =
-  //           "Network error. Please check your internet connection.";
-  //         break;
-  //       default:
-  //         break;
-  //     }
-  //     setErrors({ general: errorMessage });
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  const handleCaptchaError = (error) => {
+    console.error("CAPTCHA error:", error);
+    setErrors({
+      ...errors,
+      captcha: "Error loading CAPTCHA. Please refresh the page.",
+    });
+  };
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -148,6 +139,10 @@ export default function SignUp() {
       );
 
       setRegisterData({ fullName: "", email: "", password: "" });
+      setCaptchaVerified(false);
+      if (recaptchaRef.current) {
+        recaptchaRef.current.reset();
+      }
       navigate("/login");
     } catch (error) {
       let errorMessage = "Registration failed. Please try again.";
@@ -167,6 +162,8 @@ export default function SignUp() {
         case "auth/too-many-requests":
           errorMessage = "Too many attempts. Try again later.";
           break;
+        default:
+          console.error("Firebase error:", error);
       }
       setErrors({ general: errorMessage });
     } finally {
@@ -258,10 +255,31 @@ export default function SignUp() {
             )}
           </div>
 
+          <div className=" w-full">
+            <ReCAPTCHA
+              ref={recaptchaRef}
+              sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" 
+              onChange={handleCaptchaChange}
+              onExpired={handleCaptchaExpired}
+              onErrored={handleCaptchaError}
+              onLoad={() => setCaptchaLoaded(true)}
+            
+            />
+          </div>
+          {errors.captcha && (
+            <div className="text-center">
+              <span className="text-red-500 text-sm">{errors.captcha}</span>
+            </div>
+          )}
+
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-pink-700 text-white py-2 rounded-md hover:bg-pink-800 transition disabled:bg-pink-400 disabled:cursor-not-allowed"
+            disabled={loading || !captchaVerified}
+            className={`w-full py-2 rounded-md transition ${
+              captchaVerified && !loading
+                ? "bg-pink-700 text-white hover:bg-pink-800"
+                : "bg-pink-400 text-white cursor-not-allowed"
+            }`}
           >
             {loading ? "Processing..." : "Create account"}
           </button>
