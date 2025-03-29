@@ -1,175 +1,176 @@
-"use client";
+'use client'
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from 'react-router-dom'
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
   signOut,
   updateProfile,
-} from "firebase/auth";
-import { auth, db } from "../../config/firebaseConfig";
-import { ref, set } from "firebase/database";
-import { useState, useRef, useEffect } from "react";
-import ReCAPTCHA from "react-google-recaptcha";
+} from 'firebase/auth'
+import { auth, db } from '../../config/firebaseConfig'
+import { ref, set } from 'firebase/database'
+import { useState, useRef, useEffect } from 'react'
+import ReCAPTCHA from 'react-google-recaptcha'
 
 export default function SignUp() {
   const [registerData, setRegisterData] = useState({
-    fullName: "",
-    email: "",
-    password: "",
-  });
-  const navigate = useNavigate();
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [captchaVerified, setCaptchaVerified] = useState(false);
-  const [captchaLoaded, setCaptchaLoaded] = useState(false);
-  const recaptchaRef = useRef(null);
+    fullName: '',
+    email: '',
+    password: '',
+  })
+  const navigate = useNavigate()
+  const [errors, setErrors] = useState({})
+  const [loading, setLoading] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
+  const [captchaVerified, setCaptchaVerified] = useState(false)
+  const [captchaLoaded, setCaptchaLoaded] = useState(false)
+  const recaptchaRef = useRef(null)
 
   // Debug CAPTCHA loading
   useEffect(() => {
     // Add a global callback for when reCAPTCHA is ready
     window.onRecaptchaLoaded = () => {
-      console.log("reCAPTCHA has loaded successfully");
-      setCaptchaLoaded(true);
-    };
+      console.log('reCAPTCHA has loaded successfully')
+      setCaptchaLoaded(true)
+    }
 
     // Add script to detect if reCAPTCHA fails to load
     const checkRecaptchaLoading = setTimeout(() => {
       if (!captchaLoaded) {
-        console.warn("reCAPTCHA might not have loaded properly");
+        console.warn('reCAPTCHA might not have loaded properly')
       }
-    }, 5000);
+    }, 5000)
 
-    return () => clearTimeout(checkRecaptchaLoading);
-  }, [captchaLoaded]);
+    return () => clearTimeout(checkRecaptchaLoading)
+  }, [captchaLoaded])
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors = {}
     if (!registerData.fullName.trim()) {
-      newErrors.fullName = "Full name is required";
+      newErrors.fullName = 'Full name is required'
     }
     if (!registerData.email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = 'Email is required'
     } else if (!/\S+@\S+\.\S+/.test(registerData.email)) {
-      newErrors.email = "Email is invalid";
+      newErrors.email = 'Email is invalid'
     }
     if (!registerData.password) {
-      newErrors.password = "Password is required";
+      newErrors.password = 'Password is required'
     } else if (registerData.password.length < 6) {
-      newErrors.password = "Password should be at least 6 characters";
+      newErrors.password = 'Password should be at least 6 characters'
     }
     if (!captchaVerified) {
-      newErrors.captcha = "Please verify you are not a robot";
+      newErrors.captcha = 'Please verify you are not a robot'
     }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
   const handleInput = (e) => {
     setRegisterData({
       ...registerData,
       [e.target.name]: e.target.value,
-    });
+    })
     if (errors[e.target.name]) {
       setErrors({
         ...errors,
         [e.target.name]: null,
-      });
+      })
     }
-  };
+  }
 
   const handleCaptchaChange = (value) => {
-    console.log("CAPTCHA verified:", !!value);
-    setCaptchaVerified(!!value);
+    console.log('CAPTCHA verified:', !!value)
+    setCaptchaVerified(!!value)
     if (errors.captcha) {
       setErrors({
         ...errors,
         captcha: null,
-      });
+      })
     }
-  };
+  }
 
   const handleCaptchaExpired = () => {
-    console.log("CAPTCHA expired");
-    setCaptchaVerified(false);
-  };
+    console.log('CAPTCHA expired')
+    setCaptchaVerified(false)
+  }
 
   const handleCaptchaError = (error) => {
-    console.error("CAPTCHA error:", error);
+    console.error('CAPTCHA error:', error)
     setErrors({
       ...errors,
-      captcha: "Error loading CAPTCHA. Please refresh the page.",
-    });
-  };
+      captcha: 'Error loading CAPTCHA. Please refresh the page.',
+    })
+  }
 
   const handleSignUp = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
+    e.preventDefault()
+    if (!validateForm()) return
 
-    setLoading(true);
-    setErrors({});
-    setSuccessMessage("");
+    setLoading(true)
+    setErrors({})
+    setSuccessMessage('')
 
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         registerData.email,
         registerData.password
-      );
+      )
 
       await updateProfile(auth.currentUser, {
         displayName: registerData.fullName,
-      });
+      })
 
-      await sendEmailVerification(auth.currentUser);
+      await sendEmailVerification(auth.currentUser)
 
-      await set(ref(db, "users/" + userCredential.user.uid), {
+      await set(ref(db, 'users/' + userCredential.user.uid), {
         fullname: registerData.fullName,
         email: registerData.email,
         emailVerified: false,
+        planType: 'Free Plan',
         createdAt: new Date().toISOString(),
-      });
+      })
 
-      await signOut(auth);
+      await signOut(auth)
 
       setSuccessMessage(
         `Registration successful! Verification email sent to ${registerData.email}. 
         Please verify your email before logging in.`
-      );
+      )
 
-      setRegisterData({ fullName: "", email: "", password: "" });
-      setCaptchaVerified(false);
+      setRegisterData({ fullName: '', email: '', password: '' })
+      setCaptchaVerified(false)
       if (recaptchaRef.current) {
-        recaptchaRef.current.reset();
+        recaptchaRef.current.reset()
       }
-      navigate("/login");
+      navigate('/login')
     } catch (error) {
-      let errorMessage = "Registration failed. Please try again.";
+      let errorMessage = 'Registration failed. Please try again.'
       switch (error.code) {
-        case "auth/email-already-in-use":
-          errorMessage = "Email is already in use. Try logging in instead.";
-          break;
-        case "auth/invalid-email":
-          errorMessage = "Invalid email address format.";
-          break;
-        case "auth/weak-password":
-          errorMessage = "Password must be at least 6 characters.";
-          break;
-        case "auth/network-request-failed":
-          errorMessage = "Network error. Check your internet connection.";
-          break;
-        case "auth/too-many-requests":
-          errorMessage = "Too many attempts. Try again later.";
-          break;
+        case 'auth/email-already-in-use':
+          errorMessage = 'Email is already in use. Try logging in instead.'
+          break
+        case 'auth/invalid-email':
+          errorMessage = 'Invalid email address format.'
+          break
+        case 'auth/weak-password':
+          errorMessage = 'Password must be at least 6 characters.'
+          break
+        case 'auth/network-request-failed':
+          errorMessage = 'Network error. Check your internet connection.'
+          break
+        case 'auth/too-many-requests':
+          errorMessage = 'Too many attempts. Try again later.'
+          break
         default:
-          console.error("Firebase error:", error);
+          console.error('Firebase error:', error)
       }
-      setErrors({ general: errorMessage });
+      setErrors({ general: errorMessage })
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div className="flex min-h-[calc(100vh-66px)] items-center justify-center">
@@ -204,8 +205,8 @@ export default function SignUp() {
               placeholder="Enter your Full Name"
               className={`w-full px-4 py-2 mt-1 border rounded-md focus:outline-none ${
                 errors.fullName
-                  ? "border-red-500"
-                  : "focus:ring-2 focus:ring-pink-500"
+                  ? 'border-red-500'
+                  : 'focus:ring-2 focus:ring-pink-500'
               }`}
             />
             {errors.fullName && (
@@ -225,8 +226,8 @@ export default function SignUp() {
               placeholder="Enter Your Email Address"
               className={`w-full px-4 py-2 mt-1 border rounded-md focus:outline-none ${
                 errors.email
-                  ? "border-red-500"
-                  : "focus:ring-2 focus:ring-pink-500"
+                  ? 'border-red-500'
+                  : 'focus:ring-2 focus:ring-pink-500'
               }`}
             />
             {errors.email && (
@@ -246,8 +247,8 @@ export default function SignUp() {
               placeholder="Create a password (min. 6 characters)"
               className={`w-full px-4 py-2 mt-1 border rounded-md focus:outline-none ${
                 errors.password
-                  ? "border-red-500"
-                  : "focus:ring-2 focus:ring-pink-500"
+                  ? 'border-red-500'
+                  : 'focus:ring-2 focus:ring-pink-500'
               }`}
             />
             {errors.password && (
@@ -276,21 +277,21 @@ export default function SignUp() {
             disabled={loading || !captchaVerified}
             className={`w-full py-2 rounded-md transition ${
               captchaVerified && !loading
-                ? "bg-pink-700 text-white hover:bg-pink-800"
-                : "bg-pink-400 text-white cursor-not-allowed"
+                ? 'bg-pink-700 text-white hover:bg-pink-800'
+                : 'bg-pink-400 text-white cursor-not-allowed'
             }`}
           >
-            {loading ? "Processing..." : "Create account"}
+            {loading ? 'Processing...' : 'Create account'}
           </button>
         </form>
 
         <p className="text-center text-sm text-gray-600 mt-4">
-          Already have an account?{" "}
+          Already have an account?{' '}
           <Link to="/login" className="text-pink-500 hover:underline">
             Log in
           </Link>
         </p>
       </div>
     </div>
-  );
+  )
 }
