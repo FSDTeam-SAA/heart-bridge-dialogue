@@ -2,16 +2,6 @@ import React from "react";
 // import { toast } from "react-toastify";
 
 const AllInformation = ({ data, handlePreviousStep }) => {
-  // const handleSubmitForm = () => {
-  //   if (!data || Object.keys(data).length === 0) {
-  //     toast.error("No data available to submit.");
-  //     return;
-  //   }
-
-  //   // Reset form and remove data from local storage
-  //   resetForm();
-  //   localStorage.removeItem("multiStepFormData");
-  // };
   return (
     <div className=" p-1 md:p-6  mx-auto pb-10">
       <h2 className="text-3xl font-bold leading-[36px] text-[#c02351] text-center pb-6">
@@ -107,10 +97,6 @@ const AllInformation = ({ data, handlePreviousStep }) => {
           Back
         </button>
         <button
-          //   onClick={() =>
-          //     alert("Form Submitted! " + JSON.stringify(data, null, 2))
-          //   }
-          // onClick={handleSubmitForm}
           type="submit"
           className="bg-rose-500 text-white py-2 px-5 rounded-lg text-base font-semibold leading-normal"
         >
