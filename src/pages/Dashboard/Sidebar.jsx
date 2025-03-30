@@ -21,7 +21,10 @@ const Sidebar = () => {
     <aside className="border-r border-gray-200 flex flex-col bg-[#FAFAFA] h-full">
       {/* Logo */}
       <div className="p-4 border-b border-gray-200">
-        <Link to="/" className="flex items-center justify-center text-pink-500 font-bold text-xl">
+        <Link
+          to="/"
+          className="flex items-center justify-center text-pink-500 font-bold text-xl"
+        >
           <Heart className="mr-2 h-5 w-5 " />
           <span>HeartBridge</span>
         </Link>
@@ -37,6 +40,13 @@ const Sidebar = () => {
           >
             <Plus className="h-4 w-4 mr-2" />
             <span>New Relationship</span>
+          </Link>
+          <Link
+            to="/messages"
+            className="flex items-center mt-2 text-pink-500 hover:bg-pink-50 px-2 py-1 rounded hover:text-black font-semibold"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            <span>Message</span>
           </Link>
         </div>
 
@@ -56,12 +66,17 @@ const Sidebar = () => {
       {/* User Account */}
       <div className="p-4 border-t border-gray-200 flex items-center justify-between">
         <div className="flex items-center gap-1">
-            <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center text-red-500 mr-3">  {user?.displayName?.charAt(0).toUpperCase()}</div>
-            <h1>{user?.displayName}</h1>
+          <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center text-red-500 mr-3">
+            {' '}
+            {user?.displayName?.charAt(0).toUpperCase()}
+          </div>
+          <h1>{user?.displayName}</h1>
         </div>
 
         <Link to={'/account'}>
-            <div className="text-sm truncate py-2 px-3 rounded-lg hover:text-pink-600 hover:bg-pink-100 transition font-semibold">Account</div>
+          <div className="text-sm truncate py-2 px-3 rounded-lg hover:text-pink-600 hover:bg-pink-100 transition font-semibold">
+            Account
+          </div>
         </Link>
       </div>
     </aside>
