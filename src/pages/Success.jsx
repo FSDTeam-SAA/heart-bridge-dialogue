@@ -1,31 +1,32 @@
-
 import React, { useEffect, useState } from 'react'
-
 import { auth, db } from '../config/firebaseConfig'
-
-import { doc, getDoc } from 'firebase/firestore'
+import { ref, get } from 'firebase/database'
 import { useNavigate } from 'react-router-dom'
+import { onAuthStateChanged } from 'firebase/auth'
 
 const Success = () => {
-  const [userPlan, setUserPlan] = useState(null)
+  const [userPlan, setUserPlan] = useState('Loading...')
   const navigate = useNavigate()
 
-  // Fetch user data from Firestore on page load
   useEffect(() => {
-    const fetchUserPlan = async () => {
-      if (auth.currentUser) {
-        const userRef = doc(db, 'users', auth.currentUser.uid)
-        const docSnap = await getDoc(userRef)
+    const fetchUserPlan = async (userId) => {
+      const userRef = ref(db, 'users/' + userId)
+      const snapshot = await get(userRef)
 
-        if (docSnap.exists()) {
-          setUserPlan(docSnap.data().plan)
-        } else {
-          console.log('No such document!')
-        }
+      if (snapshot.exists()) {
+        setUserPlan(snapshot.val().planType || 'Free Plan')
+      } else {
+        console.log('No user data found.')
       }
     }
 
-    fetchUserPlan()
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        fetchUserPlan(user.uid)
+      }
+    })
+
+    return () => unsubscribe()
   }, [])
 
   return (
@@ -37,12 +38,10 @@ const Success = () => {
         Thank you for upgrading your plan. Your payment has been successfully
         processed.
       </p>
-      <p className="text-sm text-gray-600 mb-6">
+      {/* <p className="text-sm text-gray-600 mb-6">
         Your current plan:{' '}
-        <span className="font-medium text-pink-600">
-          {userPlan || 'Loading...'}
-        </span>
-      </p>
+        <span className="font-medium text-pink-600">{userPlan}</span>
+      </p> */}
 
       <button
         onClick={() => navigate('/')}
