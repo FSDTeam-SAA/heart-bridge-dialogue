@@ -1,21 +1,65 @@
-import { Link, useLocation } from "react-router-dom"
-import { Heart, Plus } from "lucide-react"
-import ProgressBar from "@ramonak/react-progress-bar";
-import { useEffect, useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../../config/firebaseConfig";
+import { Link, useLocation } from 'react-router-dom'
+import { Heart, Plus } from 'lucide-react'
+import ProgressBar from '@ramonak/react-progress-bar'
+import { useEffect, useState } from 'react'
+import { onAuthStateChanged } from 'firebase/auth'
+import { auth } from '../../config/firebaseConfig'
 
 const Sidebar = () => {
   const location = useLocation()
 
-  const [user, setUser] = useState(null);
-  
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-          setUser(currentUser);
-        });
-        return () => unsubscribe();
-    }, []);
+  const [user, setUser] = useState(null)
+  const [messageData, setMessageData] = useState({
+    messagesSent: 0,
+    messageLimit: 10,
+    planStatus: 'inactive',
+  })
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser)
+    })
+    return () => unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    const fetchMessageData = async () => {
+      const userFromLocalStorage = JSON.parse(localStorage.getItem('user'))
+      if (userFromLocalStorage?.email) {
+        try {
+          const response = await fetch(
+            `${import.meta.env.VITE_BACKEND_URL}/check-plan?email=${
+              userFromLocalStorage.email
+            }`
+          )
+          const data = await response.json()
+
+          if (data.success) {
+            setMessageData({
+              messagesSent: data.messagesSent,
+              messageLimit: data.messageLimit,
+              planStatus: data.planStatus,
+            })
+          } else {
+            setMessageData({
+              messagesSent: 0,
+              messageLimit: 10,
+              planStatus: 'inactive',
+            })
+          }
+        } catch (error) {
+          console.error('Error fetching message data:', error)
+        }
+      }
+    }
+
+    if (user) {
+      fetchMessageData()
+    }
+  }, [user])
+
+  const usagePercentage =
+    (messageData.messagesSent / messageData.messageLimit) * 100
 
   return (
     <aside className="border-r border-gray-200 flex flex-col bg-[#FAFAFA] h-full">
@@ -25,7 +69,7 @@ const Sidebar = () => {
           to="/"
           className="flex items-center justify-center text-pink-500 font-bold text-xl"
         >
-          <Heart className="mr-2 h-5 w-5 " />
+          <Heart className="mr-2 h-5 w-5" />
           <span>HeartBridge</span>
         </Link>
       </div>
@@ -53,12 +97,19 @@ const Sidebar = () => {
         {/* Message Usage */}
         <div className="px-4 py-14 border-t border-gray-200">
           <div className="flex justify-between items-center text-sm text-gray-500">
-            <span>Message usage (0/10)</span>
-            <span>0%</span>
+            <span>
+              Message usage ({messageData.messagesSent}/
+              {messageData.messageLimit})
+            </span>
+            <span>{Math.min(usagePercentage, 100)}%</span>
           </div>
 
           <div className="mt-2">
-            <ProgressBar completed={0} height="8px" bgColor="#EC4899" />
+            <ProgressBar
+              completed={Math.min(usagePercentage, 100)}
+              height="8px"
+              bgColor="#EC4899"
+            />
           </div>
         </div>
       </nav>
@@ -67,7 +118,6 @@ const Sidebar = () => {
       <div className="p-4 border-t border-gray-200 flex items-center justify-between">
         <div className="flex items-center gap-1">
           <div className="h-8 w-8 rounded-full bg-red-100 flex items-center justify-center text-red-500 mr-3">
-            {' '}
             {user?.displayName?.charAt(0).toUpperCase()}
           </div>
           <h1>{user?.displayName}</h1>
@@ -84,4 +134,3 @@ const Sidebar = () => {
 }
 
 export default Sidebar
-

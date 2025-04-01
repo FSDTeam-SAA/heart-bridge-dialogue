@@ -1,32 +1,44 @@
 import React, { useEffect, useState } from 'react'
-import { auth, db } from '../config/firebaseConfig'
-import { ref, get } from 'firebase/database'
 import { useNavigate } from 'react-router-dom'
-import { onAuthStateChanged } from 'firebase/auth'
+import axios from 'axios'
 
 const Success = () => {
   const [userPlan, setUserPlan] = useState('Loading...')
   const navigate = useNavigate()
 
   useEffect(() => {
-    const fetchUserPlan = async (userId) => {
-      const userRef = ref(db, 'users/' + userId)
-      const snapshot = await get(userRef)
+    // Get the email from localStorage
+    const user = JSON.parse(localStorage.getItem('user'))
+    const email = user?.email
 
-      if (snapshot.exists()) {
-        setUserPlan(snapshot.val().planType || 'Free Plan')
-      } else {
-        console.log('No user data found.')
-      }
+    if (email) {
+      // Make an API call to check the payment status
+      axios
+        .post(`${import.meta.env.VITE_BACKEND_URL}/check-payment-status/${email}`)
+        .then((response) => {
+          const { updatedPayments } = response.data
+
+          if (updatedPayments && updatedPayments.length > 0) {
+            // Assuming we want to get the most recent plan from the first payment
+            const latestPayment = updatedPayments[0]
+            if (latestPayment.paymentStatus === 'completed') {
+              setUserPlan(
+                `Your plan is upgraded. Message limit: ${latestPayment.messageLimit}`
+              )
+            } else {
+              setUserPlan('Payment still processing or failed.')
+            }
+          } else {
+            setUserPlan('No payment records found.')
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching payment status:', error)
+          setUserPlan('Error fetching payment status.')
+        })
+    } else {
+      setUserPlan('No user logged in.')
     }
-
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        fetchUserPlan(user.uid)
-      }
-    })
-
-    return () => unsubscribe()
   }, [])
 
   return (
@@ -38,11 +50,7 @@ const Success = () => {
         Thank you for upgrading your plan. Your payment has been successfully
         processed.
       </p>
-      {/* <p className="text-sm text-gray-600 mb-6">
-        Your current plan:{' '}
-        <span className="font-medium text-pink-600">{userPlan}</span>
-      </p> */}
-
+      <p className="text-lg text-gray-700 mb-6">{userPlan}</p>
       <button
         onClick={() => navigate('/')}
         className="px-6 py-3 bg-green-500 text-white font-medium rounded-lg hover:bg-green-600 transition"

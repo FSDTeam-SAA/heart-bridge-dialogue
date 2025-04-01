@@ -1,4 +1,3 @@
-
 import { CheckIcon } from '../shared/CheckIcon'
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
@@ -13,59 +12,38 @@ const Upgrade = () => {
 
   const user = JSON.parse(localStorage.getItem('user'))
 
-  // useEffect(() => {
-  //   const fetchUserPlan = async () => {
-  //     if (user?.email) {
-  //       try {
-  //         const response = await axios.get(
-  //           `http://localhost:5000/api/payment-status/${user.email}`
-  //         )
-  //         if (response.data.paymentStatus === 'paid') {
-  //           setUserPlan('Pro Plan')
-  //         }
-  //       } catch (error) {
-  //         console.error('Error fetching payment status:', error)
-  //       }
-  //     }
-  //   }
-  //   fetchUserPlan()
-  // }, [user?.email])
-//      'https://heart-bridge-dialogue-backend.onrender.com/api/payment',
+  useEffect(() => {
+    const fetchUserPlan = async () => {
+      if (user?.email) {
+        try {
+          const response = await axios.get(
+            `${import.meta.env.VITE_BACKEND_URL}/check-plan?email=${user.email}`
+          )
+          const { planStatus } = response.data
 
-useEffect(() => {
-  const fetchUserPlan = async () => {
-    if (user?.email) {
-      try {
-        const response = await axios.get(
-          `http://localhost:5000/api/payment-status/${user.email}`
-        )
-        const { paymentStatus, eventId } = response.data
-
-        if (paymentStatus === 'paid' && eventId !== 'Limit_finished') {
-          setUserPlan('Pro Plan')
-        } else if (eventId === 'Limit_finished') {
-          setUserPlan(null) // Allow payment again
+          if (planStatus === 'activate') {
+            setUserPlan('Pro Plan')
+          } else if (planStatus === 'finished') {
+            setUserPlan(null)
+          }
+        } catch (error) {
+          console.error('Error fetching payment status:', error)
         }
-      } catch (error) {
-        console.error('Error fetching payment status:', error)
       }
     }
-  }
-  fetchUserPlan()
-}, [user?.email])
+    fetchUserPlan()
+  }, [user?.email])
 
-
-const handleUpgrade = async () => {
+  const handleUpgrade = async () => {
     setLoading(true)
     const user = JSON.parse(localStorage.getItem('user'))
-    console.log('-----', user.email)
+
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/payment',
-
+        `${import.meta.env.VITE_BACKEND_URL}/api/payment`,
         {
           amount: 20,
-          userId: user.email,
+          email: user.email,
           eventId: 'pro_plan',
         }
       )
