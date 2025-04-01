@@ -5,10 +5,8 @@ const MessagePage = () => {
   const [message, setMessage] = useState('')
   const [response, setResponse] = useState('')
   const [loading, setLoading] = useState(false)
-  console.log(import.meta.env.VITE_SOME_KEY)
   // Define API key directly (remove for production!)
   const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY
-
 
   const handleSubmit = async () => {
     if (!message.trim()) return
@@ -32,7 +30,9 @@ const MessagePage = () => {
       )
 
       if (limitCheck.data?.status === 'limit_reached') {
-        return setResponse(limitCheck.data.message)
+        return setResponse(
+          "You've reached the message limit. Please upgrade your plan."
+        )
       }
 
       console.log('Calling OpenRouter API...')
@@ -63,57 +63,125 @@ const MessagePage = () => {
       setResponse(data.choices[0]?.message?.content || 'No response from AI.')
     } catch (error) {
       console.error('Error:', error)
-      setResponse(`Error: ${error.message || 'Request failed'}`)
+      setResponse(
+        "``` You've reached the message limit."
+
+      )
     } finally {
       setLoading(false)
     }
   }
 
   // Function to format the response with proper styling
-  const formatResponse = (text) => {
-    if (!text) return null
+const formatResponse = (text) => {
+  if (!text) return null
 
-    return text.split('\n').map((line, index) => {
-      // Bold text detection
-      const boldMatch = line.match(/\*\*(.*?)\*\*/) // Look for **bold** text
-      if (boldMatch) {
-        const parts = line.split('**')
-        return (
-          <p key={index} className="text-gray-700 mb-3">
-            {parts.map((part, i) =>
-              i % 2 === 1 ? (
-                <span
-                  key={i}
-                  className="font-semibold text-gray-800 bg-pink-50 px-1 rounded"
-                >
-                  {part}
-                </span>
-              ) : (
-                part
-              )
-            )}
-          </p>
-        )
-      }
-
-      // Regular bullet points
-      if (line.startsWith('- ')) {
-        return (
-          <div key={index} className="flex items-start mb-2 pl-4">
-            <span className="text-pink-500 mr-2 mt-1">•</span>
-            <p className="text-gray-700">{line.substring(2)}</p>
-          </div>
-        )
-      }
-
-      // Regular paragraph
+  return text.split('\n').map((line, index) => {
+    // Bold text detection
+    const boldMatch = line.match(/\*\*(.*?)\*\*/) // Look for **bold** text
+    if (boldMatch) {
+      const parts = line.split('**')
       return (
         <p key={index} className="text-gray-700 mb-3">
-          {line}
+          {parts.map((part, i) =>
+            i % 2 === 1 ? (
+              <span
+                key={i}
+                className="font-semibold text-gray-800 bg-pink-50 px-1 rounded"
+              >
+                {part}
+              </span>
+            ) : (
+              part
+            )
+          )}
         </p>
       )
-    })
-  }
+    }
+
+    // Italics text detection
+    const italicMatch = line.match(/\*(.*?)\*/) // Look for *italic* text
+    if (italicMatch) {
+      const parts = line.split('*')
+      return (
+        <p key={index} className="text-gray-700 mb-3">
+          {parts.map((part, i) =>
+            i % 2 === 1 ? (
+              <span key={i} className="italic text-gray-800">
+                {part}
+              </span>
+            ) : (
+              part
+            )
+          )}
+        </p>
+      )
+    }
+
+    // Code block detection
+    if (line.startsWith('```')) {
+      let codeBlockContent = line.slice(3)
+      return (
+        <pre key={index} className="bg-gray-800 text-red-700 p-4 rounded">
+          {codeBlockContent}
+        </pre>
+      )
+    }
+
+    // Links
+    const linkMatch = line.match(/\[([^\]]+)\]\(([^)]+)\)/) // Look for [link](url)
+    if (linkMatch) {
+      const [fullMatch, text, url] = linkMatch
+      return (
+        <p key={index} className="text-gray-700 mb-3">
+          {line.replace(
+            fullMatch,
+            `<a href="${url}" class="text-blue-500 underline">${text}</a>`
+          )}
+        </p>
+      )
+    }
+
+    // Headers (H1, H2, etc.)
+    if (line.startsWith('# ')) {
+      return (
+        <h1 key={index} className="text-2xl font-bold text-gray-900 mb-4">
+          {line.slice(2)}
+        </h1>
+      )
+    } else if (line.startsWith('## ')) {
+      return (
+        <h2 key={index} className="text-xl font-semibold text-gray-800 mb-3">
+          {line.slice(3)}
+        </h2>
+      )
+    } else if (line.startsWith('### ')) {
+      return (
+        <h3 key={index} className="text-lg font-semibold text-gray-700 mb-2">
+          {line.slice(4)}
+        </h3>
+      )
+    }
+
+    // Bullet points
+    if (line.startsWith('- ')) {
+      return (
+        <div key={index} className="flex items-start mb-2 pl-4">
+          <span className="text-pink-500 mr-2 mt-1">•</span>
+          <p className="text-gray-700">{line.substring(2)}</p>
+        </div>
+      )
+    }
+
+    // Regular paragraph
+    return (
+      <p key={index} className="text-gray-700 mb-3">
+        {line}
+      </p>
+    )
+  })
+}
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 to-purple-50 p-4 md:p-6">

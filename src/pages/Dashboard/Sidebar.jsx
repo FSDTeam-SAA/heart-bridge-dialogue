@@ -43,7 +43,7 @@ const Sidebar = () => {
           } else {
             setMessageData({
               messagesSent: 0,
-              messageLimit: 10,
+              messageLimit: 0,
               planStatus: 'inactive',
             })
           }
