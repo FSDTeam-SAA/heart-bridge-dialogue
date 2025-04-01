@@ -15,6 +15,7 @@ import PublicRoute from './PublicRoute'
 import Success from '../pages/Success'
 import Cancel from '../pages/Cancel' // Import Cancel Page
 import MessagePage from '../pages/MessagePage'
+import VerifyEmail from '../pages/Authentication/VerifyEmail';
 
 const router = createBrowserRouter([
   {
@@ -42,10 +43,16 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: '/messages',
+        path: '/verify-email',
         element: (
-            <MessagePage />
+          <PublicRoute>
+            <VerifyEmail />
+          </PublicRoute>
         ),
+      },
+      {
+        path: '/messages',
+        element: <MessagePage />,
       },
       {
         path: 'success',
