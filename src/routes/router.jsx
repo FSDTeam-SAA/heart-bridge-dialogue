@@ -17,6 +17,7 @@ import Cancel from '../pages/Cancel' // Import Cancel Page
 import MessagePage from '../pages/MessagePage'
 import VerifyEmail from '../pages/Authentication/VerifyEmail';
 import VerifyEmailbytoken from '../pages/Authentication/VerifyEmailbytoken'
+import RelationshipDetail from '../pages/RelationshipDetail'
 
 const router = createBrowserRouter([
   {
@@ -54,6 +55,10 @@ const router = createBrowserRouter([
       {
         path: '/messages',
         element: <MessagePage />,
+      },
+      {
+        path: '/relationship',
+        element: <RelationshipDetail />,
       },
       {
         path: '/verify-email',
