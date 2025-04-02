@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from 'react'
+import { useLocation } from 'react-router-dom' // Add this import
 import {
   Heart,
   Menu,
@@ -7,59 +8,63 @@ import {
   User,
   LayoutDashboard,
   LogOut,
-} from "lucide-react";
-import { Link } from "react-router-dom";
-import { auth } from "../../config/firebaseConfig";
-import { onAuthStateChanged, signOut } from "firebase/auth";
+} from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { auth } from '../../config/firebaseConfig'
+import { onAuthStateChanged, signOut } from 'firebase/auth'
 
 export default function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [user, setUser] = useState(null)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const dropdownRef = useRef(null)
+  const location = useLocation() // Get current location
 
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
+        setIsDropdownOpen(false)
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   // Prevent scrolling when menu is open
   useEffect(() => {
-    document.body.style.overflow = isMenuOpen ? "hidden" : "unset";
+    document.body.style.overflow = isMenuOpen ? 'hidden' : 'unset'
     return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [isMenuOpen]);
+      document.body.style.overflow = 'unset'
+    }
+  }, [isMenuOpen])
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, []);
+      setUser(currentUser)
+    })
+    return () => unsubscribe()
+  }, [])
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
+  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen)
 
   const handleLogout = async (event) => {
-    event.stopPropagation();
+    event.stopPropagation()
     try {
       if (auth.currentUser) {
-        await signOut(auth);
-        localStorage.removeItem("user");
-        setIsDropdownOpen(false);
-        setIsMenuOpen(false);
+        await signOut(auth)
+        localStorage.removeItem('user')
+        setIsDropdownOpen(false)
+        setIsMenuOpen(false)
       }
     } catch (error) {
-      console.error("Logout failed", error);
+      console.error('Logout failed', error)
     }
-  };
+  }
+
+  // Check if current path is /signup
+  const isSignupPage = location.pathname === '/signup'
 
   return (
     <>
@@ -76,7 +81,7 @@ export default function Navbar() {
 
           {/* Desktop navigation */}
           <div className="hidden items-center gap-7 md:flex">
-            {user ? (
+            {user && !isSignupPage ? (
               <>
                 <Link
                   to="/upgrade"
@@ -170,7 +175,7 @@ export default function Navbar() {
       {/* Mobile menu overlay */}
       <div
         className={`fixed inset-0 bg-black/20 z-50 md:hidden transition-opacity duration-500 ${
-          isMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          isMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         onClick={toggleMenu}
       ></div>
@@ -178,7 +183,7 @@ export default function Navbar() {
       {/* Mobile Slide-out Panel */}
       <div
         className={`fixed inset-y-0 left-0 w-[280px] bg-white z-50 md:hidden transform transition-transform duration-500 ${
-          isMenuOpen ? "translate-x-0" : "-translate-x-full"
+          isMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div className="flex justify-between items-center p-4 border-b">
@@ -199,34 +204,34 @@ export default function Navbar() {
 
         <div className="flex flex-col h-[calc(100%-64px)] justify-between">
           <div className="p-4 space-y-4">
-            <Link 
-            to="/account"
-            >
-              <div className="px-4 pb-2 mb-1 border-b hover:bg-[#C6255310] hover:text-[#C62553] rounded-lg">
-                <div className="font-medium">Account</div>
-                <div className="text-sm text-gray-500">
-                  {user?.email}
-                </div>
-              </div>
-            </Link>
-            <Link
-              to="/dashboard"
-              className="flex items-center gap-3 py-2 text-gray-700 hover:text-[#C62553]"
-            >
-              <LayoutDashboard className="h-5 w-5 text-[#C62553]" />
-              <span>Dashboard</span>
-            </Link>
-            <Link
-              to="/"
-              className="flex items-center gap-3 py-2 text-gray-700 hover:text-[#C62553]"
-            >
-              <User className="h-5 w-5 text-[#C62553]" />
-              <span>New Relationship</span>
-            </Link>
+            {user && !isSignupPage ? (
+              <>
+                <Link to="/account">
+                  <div className="px-4 pb-2 mb-1 border-b hover:bg-[#C6255310] hover:text-[#C62553] rounded-lg">
+                    <div className="font-medium">Account</div>
+                    <div className="text-sm text-gray-500">{user?.email}</div>
+                  </div>
+                </Link>
+                <Link
+                  to="/dashboard"
+                  className="flex items-center gap-3 py-2 text-gray-700 hover:text-[#C62553]"
+                >
+                  <LayoutDashboard className="h-5 w-5 text-[#C62553]" />
+                  <span>Dashboard</span>
+                </Link>
+                <Link
+                  to="/"
+                  className="flex items-center gap-3 py-2 text-gray-700 hover:text-[#C62553]"
+                >
+                  <User className="h-5 w-5 text-[#C62553]" />
+                  <span>New Relationship</span>
+                </Link>
+              </>
+            ) : null}
           </div>
 
           <div className="p-4 border-t">
-            {user ? (
+            {user && !isSignupPage ? (
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-3 py-2 text-gray-700 hover:text-[#C62553] w-full text-left"
@@ -256,5 +261,5 @@ export default function Navbar() {
         </div>
       </div>
     </>
-  );
+  )
 }

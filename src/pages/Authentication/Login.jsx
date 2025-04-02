@@ -120,11 +120,11 @@ export default function Login() {
               <label className="block text-sm font-medium text-gray-700">
                 Password<span className="text-red-500">*</span>
               </label>
-              <Link to={"/forgot-password"}>
+              {/* <Link to={"/forgot-password"}>
                 <h1 className="block text-sm cursor-pointer hover:text-pink-500 font-semibold text-gray-500">
                   Forgot password?
                 </h1>
-              </Link>
+              </Link> */}
             </div>
             <input
               type="password"
