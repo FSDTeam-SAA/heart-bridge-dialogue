@@ -16,6 +16,7 @@ import Success from '../pages/Success'
 import Cancel from '../pages/Cancel' // Import Cancel Page
 import MessagePage from '../pages/MessagePage'
 import VerifyEmail from '../pages/Authentication/VerifyEmail';
+import VerifyEmailbytoken from '../pages/Authentication/VerifyEmailbytoken'
 
 const router = createBrowserRouter([
   {
@@ -42,17 +43,21 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-      {
-        path: '/verify-email',
-        element: (
-          <PublicRoute>
-            <VerifyEmail />
-          </PublicRoute>
-        ),
-      },
+      // {
+      //   path: '/verify-email',
+      //   element: (
+      //     <PublicRoute>
+      //       <VerifyEmail />
+      //     </PublicRoute>
+      //   ),
+      // },
       {
         path: '/messages',
         element: <MessagePage />,
+      },
+      {
+        path: '/verify-email',
+        element: <VerifyEmailbytoken />,
       },
       {
         path: 'success',

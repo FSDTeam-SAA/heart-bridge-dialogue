@@ -104,6 +104,58 @@ export default function SignUp() {
   }
 
 
+  // const handleSignUp = async (e) => {
+  //   e.preventDefault()
+  //   if (!validateForm()) return
+
+  //   setLoading(true)
+  //   setErrors({})
+  //   setSuccessMessage('')
+
+  //   try {
+  //     const userCredential = await createUserWithEmailAndPassword(
+  //       auth,
+  //       registerData.email,
+  //       registerData.password,
+        
+  //     )
+
+  //     await updateProfile(auth.currentUser, {
+  //       displayName: registerData.fullName,
+  //     })
+
+  //     await sendEmailVerification(auth.currentUser)
+
+  //     await set(ref(db, 'users/' + userCredential.user.uid), {
+  //       fullname: registerData.fullName,
+  //       email: registerData.email,
+  //       emailVerified: false,
+  //       planType: 'Free Plan',
+  //       createdAt: new Date().toISOString(),
+  //     })
+
+  //     await signOut(auth)
+
+  //     // Clear form and reset CAPTCHA
+  //     setRegisterData({ fullName: '', email: '', password: '' })
+  //     setCaptchaVerified(false)
+  //     if (recaptchaRef.current) {
+  //       recaptchaRef.current.reset()
+  //     }
+
+  //     // Redirect to verification page instead of login
+  //     navigate('/verify-email', {
+  //       state: {
+  //         email: registerData.email,
+  //       },
+  //     })
+  //   } catch (error) {
+  //     // ... (keep existing error handling)
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
+
   const handleSignUp = async (e) => {
     e.preventDefault()
     if (!validateForm()) return
@@ -116,8 +168,7 @@ export default function SignUp() {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         registerData.email,
-        registerData.password,
-        
+        registerData.password
       )
 
       await updateProfile(auth.currentUser, {
@@ -134,7 +185,10 @@ export default function SignUp() {
         createdAt: new Date().toISOString(),
       })
 
-      await signOut(auth)
+      // Don't sign out immediately - let user know verification was sent
+      setSuccessMessage(
+        `Verification email sent to ${registerData.email}. Please check your inbox to verify your account.`
+      )
 
       // Clear form and reset CAPTCHA
       setRegisterData({ fullName: '', email: '', password: '' })
@@ -142,20 +196,16 @@ export default function SignUp() {
       if (recaptchaRef.current) {
         recaptchaRef.current.reset()
       }
-
-      // Redirect to verification page instead of login
-      navigate('/verify-email', {
-        state: {
-          email: registerData.email,
-        },
-      })
     } catch (error) {
-      // ... (keep existing error handling)
+      // Handle errors
+      setErrors({
+        general: error.message || 'Registration failed. Please try again.',
+      })
     } finally {
       setLoading(false)
     }
   }
-
+    
   return (
     <div className="flex min-h-[calc(100vh-66px)] items-center justify-center">
       <div className="w-full max-w-md bg-white p-6 rounded-2xl shadow-md">
