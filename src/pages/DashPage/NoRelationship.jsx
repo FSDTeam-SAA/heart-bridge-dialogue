@@ -3,12 +3,15 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ref, onValue } from "firebase/database";
 import { db } from "../../config/firebaseConfig";
+import DashNav from "../Dashboard/DashNav";
 
 const NoRelationship = () => {
   const [relationships, setRelationships] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedCard, setExpandedCard] = useState(null);
+  const [viewMode, setViewMode] = useState('grid')
 
+  // get data form firebase
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
 
@@ -29,6 +32,7 @@ const NoRelationship = () => {
       setRelationships(relationshipsArray);
       setLoading(false);
     });
+    console.log("From no relationship",relationships);
 
     return () => unsubscribe();
   }, []);
@@ -98,80 +102,73 @@ const NoRelationship = () => {
       </div>
     );
   }
+  console.log("_____",relationships)
 
   return (
-    <div className="h-full p-8 max-w-6xl mx-auto">
-      <h1 className="text-4xl font-bold text-[#C62553] mb-8 text-center">
-        Your Relationships
-      </h1>
-      <div className="grid gap-6">
-        {relationships.map((relationship) => (
-          <div
-            key={relationship.id}
-            className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer"
-            onClick={() => toggleExpand(relationship.id)}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-xl font-semibold">
-                  {relationship.relationshipTitle || "Unnamed Relationship"}
-                </h3>
-                <p className="text-gray-600 mt-2">
-                  {relationship.basicInfo?.relationshipType} •{" "}
-                  {relationship.basicInfo?.duration &&
-                    ` ${formatDuration(
-                      relationship.basicInfo.duration
-                    )} • `}{" "}
-                  {new Date(relationship.submittedAt).toLocaleDateString()}
-                </p>
+    <div>
+      {/* navbar */}
+      <DashNav viewMode={viewMode} setViewMode={setViewMode} />
+
+      {/* content */}
+      <div className="h-full p-8 max-w-6xl mx-auto">
+        <h1 className="text-4xl font-bold text-[#C62553] mb-8 text-center">
+          Your Relationships
+        </h1>
+        <div
+          className={
+            viewMode === 'grid'
+              ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'
+              : 'grid grid-cols-1 gap-8'
+          }
+        >
+          {relationships.map((relationship) => (
+            <Link to={`/messages/${relationship.id}`}>
+              <div
+                key={relationship.id}
+                className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer"
+                onClick={() => toggleExpand(relationship.id)}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-xl font-semibold">
+                      {relationship.relationshipTitle || 'Unnamed Relationship'}
+                    </h3>
+                    <p className="text-gray-600 mt-2">
+                      {relationship.basicInfo?.relationshipType} •{' '}
+                      {relationship.basicInfo?.duration &&
+                        ` ${formatDuration(
+                          relationship.basicInfo.duration
+                        )} • `}{' '}
+                      {new Date(relationship.submittedAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm ${
+                        relationship.status === 'pending'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-green-100 text-green-800'
+                      }`}
+                    >
+                      {relationship.status}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-4">
-                <span
-                  className={`px-3 py-1 rounded-full text-sm ${
-                    relationship.status === "pending"
-                      ? "bg-yellow-100 text-yellow-800"
-                      : "bg-green-100 text-green-800"
-                  }`}
-                >
-                  {relationship.status}
-                </span>
-                {expandedCard === relationship.id ? (
-                  <ChevronUp className="text-gray-500" />
-                ) : (
-                  <ChevronDown className="text-gray-500" />
-                )}
-              </div>
-            </div>
-            {expandedCard === relationship.id && (
-              <div className="mt-6 pt-6 border-t border-gray-100 grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(relationship).map(
-                  ([key, value]) =>
-                    key !== "id" && (
-                      <div key={key} className="p-4 bg-gray-50 rounded-lg">
-                        <h4 className="text-sm font-semibold text-[#C62553] mb-2">
-                          {formatKey(key)}
-                        </h4>
-                        <div className="text-gray-700">
-                          {renderValue(value)}
-                        </div>
-                      </div>
-                    )
-                )}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-      <div className="mt-8 text-center">
-        <Link
+            </Link>
+          ))}
+        </div>
+        <div className="mt-8 text-center">
+          {/* <Link
           to="/"
           className="bg-gradient-to-r from-pink-500 to-[#C62553] text-white font-medium py-2 px-6 rounded-full"
         >
           Add New Relationship
-        </Link>
+        </Link> */}
+        </div>
       </div>
     </div>
-  );
+  )
 };
 
 export default NoRelationship;

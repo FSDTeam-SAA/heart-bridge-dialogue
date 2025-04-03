@@ -296,10 +296,18 @@ export default function Login() {
             />
           </div>
           <div>
-            <div className="flex items-center justify-between">
-              <label className="block text-sm font-medium text-gray-700">
-                Password<span className="text-red-500">*</span>
-              </label>
+            <div>
+              <div className="flex justify-between items-center">
+                <div className="block text-sm font-medium text-gray-700">
+                  Password<span className="text-red-500">*</span>
+                </div>
+
+                <Link to={'/forgot-password'}>
+                  <div className="block text-sm font-medium text-gray-700">
+                    Forget Password?
+                  </div>
+                </Link>
+              </div>
             </div>
             <input
               type="password"

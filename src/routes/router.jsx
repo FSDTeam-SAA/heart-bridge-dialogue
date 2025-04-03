@@ -18,6 +18,7 @@ import MessagePage from '../pages/MessagePage'
 import VerifyEmail from '../pages/Authentication/VerifyEmail';
 import VerifyEmailbytoken from '../pages/Authentication/VerifyEmailbytoken'
 import RelationshipDetail from '../pages/RelationshipDetail'
+import Message from '../pages/Message'
 
 const router = createBrowserRouter([
   {
@@ -52,9 +53,13 @@ const router = createBrowserRouter([
       //     </PublicRoute>
       //   ),
       // },
+      // {
+      //   path: '/messages',
+      //   element: <MessagePage />,
+      // },
       {
-        path: '/messages',
-        element: <MessagePage />,
+        path: '/messages/:id',
+        element: <Message />
       },
       {
         path: '/relationship',

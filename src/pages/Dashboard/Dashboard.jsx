@@ -35,6 +35,9 @@ import {
   LayoutList,
 } from 'lucide-react'
 import ProgressBar from '@ramonak/react-progress-bar'
+import { ref, onValue } from 'firebase/database'
+import { db } from '../../config/firebaseConfig'
+import DashNav from './DashNav'
 
 const DashboardLayout = () => {
   const location = useLocation()
@@ -44,7 +47,7 @@ const DashboardLayout = () => {
     messageLimit: 10,
     planStatus: 'inactive',
   })
-  const [viewMode, setViewMode] = useState('grid')
+  const [relationships, setRelationships] = useState([])
 
   const [loading, setLoading] = useState(true)
 
@@ -88,6 +91,34 @@ const DashboardLayout = () => {
     }
   }, [user])
 
+  // get data form firebase
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'))
+
+    if (!user?.uid) {
+      setLoading(false)
+      return
+    }
+
+    const relationshipsRef = ref(db, `users/${user.uid}/formSubmissions`)
+    const unsubscribe = onValue(relationshipsRef, (snapshot) => {
+      const data = snapshot.val()
+      const relationshipsArray = data
+        ? Object.entries(data).map(([key, value]) => ({
+            id: key,
+            ...value,
+          }))
+        : []
+      setRelationships(relationshipsArray)
+      setLoading(false)
+    })
+   
+
+    return () => unsubscribe()
+  }, [])
+
+   console.log('From no relationship from dashboard', relationships)
+
   const usagePercentage =
     messageData.messageLimit > 0
       ? (messageData.messagesSent / messageData.messageLimit) * 100
@@ -124,21 +155,37 @@ const DashboardLayout = () => {
               </h2>
               <div className="mt-2 space-y-1">
                 <Link
-                  to="/new-relationship"
-                  className="w-full flex items-center text-sm font-medium text-pink-600 hover:bg-pink-50 px-2 py-1.5 rounded-md"
+                  to="/"
+                  className="w-full flex items-center text-sm font-medium text-pink-600 hover:bg-pink-50 px-2 py-1.5 rounded-md "
                 >
                   <Plus className="mr-2 h-4 w-4" />
                   <span>New Relationship</span>
                 </Link>
-                <Link
+                {/* <Link
                   to="/messages"
                   className="w-full flex items-center text-sm font-medium text-pink-600 hover:bg-pink-50 px-2 py-1.5 rounded-md"
                 >
                   <MessageCircle className="mr-2 h-4 w-4" />
                   <span>Messages</span>
-                </Link>
+                </Link> */}
               </div>
             </div>
+
+            <nav className="py-2 border-t border-border/30">
+              <ul>
+                {relationships.map((relationship) => (
+                  <li key={relationship.id}>
+                    <Link
+                      to={`/messages/${relationship.id}`}
+                      className="w-full flex items-center text-sm font-medium text-black hover:bg-gray-200 px-4 py-2 rounded-md"
+                    >
+                      <MessageCircle className="mr-2 h-4 w-4" />
+                      <span>{relationship.relationshipTitle}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
 
             {/* Message Usage */}
             <div className="px-4 py-4 mt-4 border-t border-border/30">
@@ -185,49 +232,9 @@ const DashboardLayout = () => {
         {/* Main Content */}
         <main className="flex-1 p-6">
           <div className="max-w-7xl mx-auto space-y-8">
-            {/* View Mode Toggle */}
-            <div className="flex justify-between items-center">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-600 to-pink-800 bg-clip-text text-transparent">
-                Dashboard
-              </h1>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-md ${
-                    viewMode === 'grid'
-                      ? 'bg-pink-100 text-pink-600'
-                      : 'bg-muted'
-                  }`}
-                >
-                  <LayoutGrid className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-md ${
-                    viewMode === 'list'
-                      ? 'bg-pink-100 text-pink-600'
-                      : 'bg-muted'
-                  }`}
-                >
-                  <LayoutList className="h-5 w-5" />
-                </button>
-                <Link
-                  to="/new-relationship"
-                  className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center"
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  New Relationship
-                </Link>
-              </div>
-            </div>
 
             {/* Content */}
             <div
-              className={
-                viewMode === 'grid'
-                  ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'
-                  : 'flex flex-col space-y-4'
-              }
             >
               <Outlet />
             </div>
@@ -239,3 +246,4 @@ const DashboardLayout = () => {
 }
 
 export default DashboardLayout
+
