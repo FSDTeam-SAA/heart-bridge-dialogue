@@ -19,6 +19,7 @@ import VerifyEmail from '../pages/Authentication/VerifyEmail';
 import VerifyEmailbytoken from '../pages/Authentication/VerifyEmailbytoken'
 import RelationshipDetail from '../pages/RelationshipDetail'
 import Message from '../pages/Message'
+import ForgetPass from '../pages/Authentication/ForgotPass'
 
 const router = createBrowserRouter([
   {
@@ -59,7 +60,11 @@ const router = createBrowserRouter([
       // },
       {
         path: '/messages/:id',
-        element: <Message />
+        element: (
+          <PrivateRoute>
+            <Message />
+          </PrivateRoute>
+        ),
       },
       {
         path: '/relationship',
@@ -90,6 +95,14 @@ const router = createBrowserRouter([
         element: (
           <PublicRoute>
             <SignUp />
+          </PublicRoute>
+        ),
+      },
+      {
+        path: 'forgot-password',
+        element: (
+          <PublicRoute>
+            <ForgetPass />
           </PublicRoute>
         ),
       },

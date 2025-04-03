@@ -304,7 +304,7 @@ export default function Login() {
 
                 <Link to={'/forgot-password'}>
                   <div className="block text-sm font-medium text-gray-700">
-                    Forget Password?
+                    Forgot Password?
                   </div>
                 </Link>
               </div>

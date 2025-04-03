@@ -134,7 +134,6 @@ const Personalities = ({ handlePreviousStep, handleNextStep }) => {
         {/* first part  */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 my-5">
           <div className="col-span-1">
-            <h5 className="text-lg font-medium leading-[16px] text-[#09090b] pb-4">Yetta Holmes</h5>
             <label
               className="text-base font-medium leading-normal text-black"
               htmlFor="loveLanguage1"
@@ -162,7 +161,6 @@ const Personalities = ({ handlePreviousStep, handleNextStep }) => {
             )}
           </div>
           <div className="col-span-1">
-          <h5 className="text-lg font-medium leading-[16px] text-[#09090b] pb-4">Wyatt Caldwell</h5>
             <label
               className="text-base font-medium leading-normal text-black"
               htmlFor="loveLanguage2"

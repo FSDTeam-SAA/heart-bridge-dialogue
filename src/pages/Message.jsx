@@ -220,7 +220,21 @@ const Message = () => {
         </div>
 
         {/* content */}
-        <div className="border border-red-500 w-[70%]">content</div>
+        <div className="border border-red-500 w-[70%]">
+          <div className="flex items-center gap-2">
+            <div className="text-pink-500">
+              <CircleAlert />
+            </div>
+
+            <div>
+              <h1 className="font-semibold">Relationship Details</h1>
+            </div>
+          </div>
+
+          <h1 className="text-gray-500 my-3 font-medium">
+            Key information about your relationship
+          </h1>
+        </div>
       </div>
     </div>
   )

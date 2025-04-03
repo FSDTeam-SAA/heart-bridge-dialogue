@@ -8,10 +8,12 @@ import {
   User,
   LayoutDashboard,
   LogOut,
+  CreditCard,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { auth } from '../../config/firebaseConfig'
 import { onAuthStateChanged, signOut } from 'firebase/auth'
+import axios from 'axios'
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -19,6 +21,9 @@ export default function Navbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const dropdownRef = useRef(null)
   const location = useLocation() // Get current location
+
+  const userInfo = JSON.parse(localStorage.getItem('user'))
+  const [userPlan, setUserPlan] = useState(false)
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -30,6 +35,29 @@ export default function Navbar() {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  useEffect(() => {
+    const fetchUserPlan = async () => {
+      if (userInfo?.email) {
+        try {
+          const response = await axios.get(
+            `${import.meta.env.VITE_BACKEND_URL}/check-plan?email=${
+              userInfo.email
+            }`
+          )
+          setUserPlan(response.data.success)
+        } catch (error) {
+          console.error('Error fetching payment status:', error)
+        }
+      }
+    }
+    
+    fetchUserPlan()
+  }, [user?.email])
+
+  console.log(userPlan)
+
+  
 
   // Prevent scrolling when menu is open
   useEffect(() => {
@@ -83,13 +111,15 @@ export default function Navbar() {
           <div className="hidden items-center gap-7 md:flex">
             {user && !isSignupPage ? (
               <>
-                <Link
-                  to="/upgrade"
-                  className="flex items-center gap-1 rounded-full border px-4 py-1.5 text-[18px] font-medium text-[#C62553] hover:bg-[#C6255310]"
-                >
-                  <Sparkles className="h-4 w-4 text-[#C62553]" />
-                  Upgrade
-                </Link>
+                {userPlan || (
+                  <Link
+                    to="/upgrade"
+                    className="flex items-center gap-1 rounded-full border px-4 py-1.5 text-[18px] font-medium text-[#C62553] hover:bg-[#C6255310]"
+                  >
+                    <Sparkles className="h-4 w-4 text-[#C62553]" />
+                    Upgrade
+                  </Link>
+                )}
 
                 {/* Desktop User Dropdown */}
                 <div className="relative" ref={dropdownRef}>
@@ -127,6 +157,14 @@ export default function Navbar() {
                         >
                           <User className="h-5 w-5 text-[#C62553]" />
                           <span>New Relationship</span>
+                        </Link>
+
+                        <Link
+                          to="/account/subscription"
+                          className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-[#C6255310] hover:text-[#C62553] rounded-lg"
+                        >
+                          <CreditCard className="h-5 w-5 text-[#C62553]" />
+                          <span>Manage Subscription</span>
                         </Link>
                       </div>
 
@@ -225,6 +263,13 @@ export default function Navbar() {
                 >
                   <User className="h-5 w-5 text-[#C62553]" />
                   <span>New Relationship</span>
+                </Link>
+                <Link
+                  to="/account/subscription"
+                  className="flex items-center gap-3 py-2 text-gray-700 hover:text-[#C62553]"
+                >
+                  <CreditCard className="mr-2 h-5 w-5" />
+                  <span>Manage Subscription</span>
                 </Link>
               </>
             ) : null}
