@@ -1,27 +1,3 @@
-
-// import { Outlet } from "react-router-dom";
-// import Sidebar from "./Sidebar";
-
-// const Dashboard = () => {
-//     return (
-//         <section className="flex gap-10 ">
-            
-//             {/* Sidebar */}
-//             <div className=" w-[14%] hidden lg:flex flex-col sticky top-0 h-screen overflow-auto">
-//                 <Sidebar />
-//             </div>
-
-//             {/* Content Section */}
-//             <div className="w-[85%] min-h-screen mx-auto">
-//                 <Outlet />
-//             </div>
-
-//         </section>
-//     );
-// };
-
-// export default Dashboard;
-
 import { Outlet } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
@@ -44,7 +20,7 @@ const DashboardLayout = () => {
   const [user, setUser] = useState(null)
   const [messageData, setMessageData] = useState({
     messagesSent: 0,
-    messageLimit: 10,
+    messageLimit: 0,
     planStatus: 'inactive',
   })
   const [relationships, setRelationships] = useState([])
@@ -76,7 +52,7 @@ const DashboardLayout = () => {
           if (data.success) {
             setMessageData({
               messagesSent: data.messagesSent || 0,
-              messageLimit: data.messageLimit || 10,
+              messageLimit: data.messageLimit || 0,
               planStatus: data.planStatus || 'inactive',
             })
           }
@@ -119,10 +95,14 @@ const DashboardLayout = () => {
 
    console.log('From no relationship from dashboard', relationships)
 
-  const usagePercentage =
-    messageData.messageLimit > 0
-      ? (messageData.messagesSent / messageData.messageLimit) * 100
-      : 0
+  // const usagePercentage =
+  //   messageData.messageLimit > 0
+  //     ? (messageData.messagesSent / messageData.messageLimit) * 100
+  //     : 0
+   const usagePercentage = Math.min(
+     (messageData.messagesSent / messageData.messageLimit) * 100,
+     100
+   ).toFixed(2)
 
   if (loading) {
     return (
@@ -194,7 +174,7 @@ const DashboardLayout = () => {
                   Message usage ({messageData.messagesSent}/
                   {messageData.messageLimit})
                 </span>
-                <span>{Math.min(usagePercentage, 100)}%</span>
+                <span>{usagePercentage}%</span>
               </div>
               <div className="mt-2">
                 <ProgressBar

@@ -39,10 +39,10 @@ export default function Profile() {
         </div>
 
         <div>
-          <h3 className="font-medium mb-2">Current Plan</h3>
-          <div className="inline-block bg-pink-100 text-pink-600 px-3 py-1 rounded-full text-sm">
+          {/* <h3 className="font-medium mb-2">Current Plan</h3> */}
+          {/* <div className="inline-block bg-pink-100 text-pink-600 px-3 py-1 rounded-full text-sm">
             Free Plan
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

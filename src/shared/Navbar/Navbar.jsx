@@ -45,7 +45,7 @@ export default function Navbar() {
               userInfo.email
             }`
           )
-          setUserPlan(response.data.success)
+          setUserPlan(response.data)
         } catch (error) {
           console.error('Error fetching payment status:', error)
         }
@@ -55,7 +55,7 @@ export default function Navbar() {
     fetchUserPlan()
   }, [user?.email])
 
-  console.log(userPlan)
+  console.log("jhgjbjb",userPlan)
 
   
 
@@ -111,7 +111,7 @@ export default function Navbar() {
           <div className="hidden items-center gap-7 md:flex">
             {user && !isSignupPage ? (
               <>
-                {userPlan || (
+                {userPlan.planStatus !== 'activate' && (
                   <Link
                     to="/upgrade"
                     className="flex items-center gap-1 rounded-full border px-4 py-1.5 text-[18px] font-medium text-[#C62553] hover:bg-[#C6255310]"
@@ -181,22 +181,7 @@ export default function Navbar() {
                   )}
                 </div>
               </>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="text-gray-700 hover:text-[#C62553] text-sm font-bold"
-                >
-                  Log in
-                </Link>
-                <Link
-                  to="/signup"
-                  className="rounded-full bg-[#C62553] px-6 py-[9px] text-white hover:bg-[#B01F48]"
-                >
-                  Sign up
-                </Link>
-              </>
-            )}
+            ) : null}
           </div>
 
           {/* Mobile menu button */}

@@ -50,7 +50,7 @@ const Success = () => {
         Thank you for upgrading your plan. Your payment has been successfully
         processed.
       </p>
-      <p className="text-lg text-gray-700 mb-6">{userPlan}</p>
+    
       <button
         onClick={() => navigate('/')}
         className="px-6 py-3 bg-green-500 text-white font-medium rounded-lg hover:bg-green-600 transition"

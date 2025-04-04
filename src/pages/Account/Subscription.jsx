@@ -1,16 +1,523 @@
-import { CreditCard, CheckCircle, ArrowRight } from "lucide-react"
+
+// import { CreditCard, CheckCircle, ArrowRight } from 'lucide-react'
+// import { useEffect, useState } from 'react'
+// import { useNavigate } from 'react-router-dom'
+
+// export default function Subscription() {
+//   const [messageData, setMessageData] = useState({
+//     messagesSent: 0,
+//     messageLimit: 0,
+//     planStatus: 'inactive',
+//   })
+
+//   const [user, setUser] = useState(null)
+//   const [loading, setLoading] = useState(false)
+//   const navigate = useNavigate()
+
+//   useEffect(() => {
+//     const userFromLocalStorage = JSON.parse(
+//       localStorage.getItem('user') || '{}'
+//     )
+//     setUser(userFromLocalStorage)
+
+//     const fetchMessageData = async () => {
+//       try {
+//         if (userFromLocalStorage?.email) {
+//           const response = await fetch(
+//             `${import.meta.env.VITE_BACKEND_URL}/check-plan?email=${
+//               userFromLocalStorage.email
+//             }`
+//           )
+//           const data = await response.json()
+
+//           if (data.success) {
+//             setMessageData({
+//               messagesSent: data.messagesSent || 0,
+//               messageLimit: data.messageLimit || 10,
+//               planStatus: data.planStatus || 'inactive',
+//             })
+//           }
+//         }
+//       } catch (error) {
+//         console.error('Error fetching message data:', error)
+//       }
+//     }
+
+//     fetchMessageData()
+//   }, [])
+
+//   const usagePercentage = Math.min(
+//     (messageData.messagesSent / messageData.messageLimit) * 100,
+//     100
+//   ).toFixed(2)
+
+//   const planLabel =
+//     messageData.planStatus === 'activate' ? 'Pro Plan' : 'Free Plan'
+
+//   const benefits =
+//     messageData.planStatus === 'activate'
+//       ? ['260 messages per month', 'Advanced insights', 'Priority support']
+//       : [
+//           '10 messages per month',
+//           'Text-based insights',
+//           'Basic relationship analysis',
+//         ]
+
+//   const handleCancelSubscription = async () => {
+//     if (!user?.email) return
+//     setLoading(true)
+//     try {
+//       const response = await fetch(
+//         `${import.meta.env.VITE_BACKEND_URL}/finish-plan`,
+//         {
+//           method: 'POST',
+//           headers: { 'Content-Type': 'application/json' },
+//           body: JSON.stringify({ email: user.email }),
+//         }
+//       )
+
+//       const data = await response.json()
+
+//       if (data.success) {
+//         setMessageData((prev) => ({
+//           ...prev,
+//           planStatus: 'inactive',
+//         }))
+//       } else {
+//         console.error(data.error || 'Failed to cancel subscription')
+//       }
+//     } catch (error) {
+//       console.error('Error cancelling subscription:', error)
+//     } finally {
+//       setLoading(false)
+//     }
+//   }
+
+//   return (
+//     <div className="bg-white rounded-lg p-6 border border-gray-100">
+//       <div className="flex items-center gap-2 mb-2">
+//         <CreditCard className="h-5 w-5 text-pink-600" />
+//         <h2 className="text-xl font-semibold">Subscription Plan</h2>
+//       </div>
+//       <p className="text-gray-600 mb-6">Manage your subscription and usage</p>
+
+//       <div className="space-y-8">
+//         <div className="flex justify-between items-start">
+//           <div>
+//             <h3 className="font-semibold text-lg">{planLabel}</h3>
+//             <p className="text-gray-600">
+//               {messageData.planStatus === 'activate'
+//                 ? 'Full access to premium insights and extended usage'
+//                 : 'Basic access to relationship insights'}
+//             </p>
+//           </div>
+//           <div className="bg-pink-100 text-pink-600 px-3 py-1 rounded-full text-sm">
+//             {planLabel}
+//           </div>
+//         </div>
+
+//         <div>
+//           <div className="flex justify-between mb-1">
+//             <span className="text-sm text-gray-600">
+//               Message usage ({messageData.messagesSent}/
+//               {messageData.messageLimit})
+//             </span>
+//             <span className="text-sm text-gray-600">{usagePercentage}%</span>
+//           </div>
+//           <div className="w-full bg-gray-200 rounded-full h-2">
+//             <div
+//               className="bg-pink-600 h-2 rounded-full"
+//               style={{ width: `${usagePercentage}%` }}
+//             ></div>
+//           </div>
+//         </div>
+
+//         <div>
+//           <h3 className="font-semibold text-lg mb-4">Plan Benefits</h3>
+//           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+//             {benefits.map((benefit, index) => (
+//               <div key={index} className="flex items-center gap-2">
+//                 <CheckCircle className="h-5 w-5 text-pink-600" />
+//                 <span>{benefit}</span>
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+
+//         {messageData.planStatus === 'activate' ? (
+//           <button
+//             onClick={handleCancelSubscription}
+//             disabled={loading}
+//             className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-4 rounded-md transition-colors flex items-center justify-center"
+//           >
+//             {loading ? 'Cancelling...' : 'Cancel Subscription'}
+//           </button>
+//         ) : (
+//           <button
+//             onClick={() => navigate('/upgrade')}
+//             className="w-full bg-pink-600 hover:bg-pink-700 text-white py-3 px-4 rounded-md transition-colors flex items-center justify-center"
+//           >
+//             Upgrade Your Plan
+//             <ArrowRight className="ml-2 h-5 w-5" />
+//           </button>
+//         )}
+
+//         <div className="pt-4 border-t">
+//           <h3 className="font-semibold text-lg mb-2">Message Usage</h3>
+//           <p className="text-gray-600 mb-4">
+//             Your usage history for the current billing cycle
+//           </p>
+
+//           <div className="flex justify-between items-center mb-1">
+//             <div>
+//               <h4 className="font-medium">Total Messages</h4>
+//               <p className="text-sm text-gray-600">
+//                 {messageData.messagesSent} out of {messageData.messageLimit}{' '}
+//                 messages used
+//               </p>
+//             </div>
+//             <div className="text-right">
+//               <span className="text-xl font-semibold">
+//                 {messageData.messageLimit - messageData.messagesSent}
+//               </span>
+//               <p className="text-sm text-gray-600">Messages remaining</p>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   )
+// }
+
+
+// import { CreditCard, CheckCircle, ArrowRight } from 'lucide-react'
+// import { useEffect, useState } from 'react'
+// import { useNavigate } from 'react-router-dom'
+
+// export default function Subscription() {
+//   const [messageData, setMessageData] = useState({
+//     messagesSent: 0,
+//     messageLimit: 10, // Default to free plan limits
+//     planStatus: 'inactive',
+//   })
+
+//   const [user, setUser] = useState(null)
+//   const [loading, setLoading] = useState(false)
+//   const navigate = useNavigate()
+
+//   useEffect(() => {
+//     const userFromLocalStorage = JSON.parse(
+//       localStorage.getItem('user') || '{}'
+//     )
+//     setUser(userFromLocalStorage)
+
+//     const fetchMessageData = async () => {
+//       try {
+//         if (userFromLocalStorage?.email) {
+//           const response = await fetch(
+//             `${import.meta.env.VITE_BACKEND_URL}/check-plan?email=${
+//               userFromLocalStorage.email
+//             }`
+//           )
+//           const data = await response.json()
+
+//           if (data.success) {
+//             setMessageData({
+//               messagesSent: data.messagesSent || 0,
+//               messageLimit: data.messageLimit || 10,
+//               planStatus: data.planStatus || 'inactive',
+//             })
+//           } else if (
+//             data.message === 'No active plan found for this user' &&
+//             data.planStatus === 'finished'
+//           ) {
+//             // Handle case when no active plan is found
+//             setMessageData({
+//               messagesSent: 0,
+//               messageLimit: 10, // Reset to free plan limits
+//               planStatus: 'inactive',
+//             })
+//           }
+//         }
+//       } catch (error) {
+//         console.error('Error fetching message data:', error)
+//       }
+//     }
+
+//     fetchMessageData()
+//   }, [])
+
+//   const usagePercentage = Math.min(
+//     (messageData.messagesSent / messageData.messageLimit) * 100,
+//     100
+//   ).toFixed(2)
+
+//   const planLabel =
+//     messageData.planStatus === 'activate' ? 'Pro Plan' : 'Free Plan'
+
+//   const benefits =
+//     messageData.planStatus === 'activate'
+//       ? ['260 messages per month', 'Advanced insights', 'Priority support']
+//       : [
+//           '10 messages per month',
+//           'Text-based insights',
+//           'Basic relationship analysis',
+//         ]
+
+//   const handleCancelSubscription = async () => {
+//     if (!user?.email) return
+//     setLoading(true)
+//     try {
+//       const response = await fetch(
+//         `${import.meta.env.VITE_BACKEND_URL}/finish-plan`,
+//         {
+//           method: 'POST',
+//           headers: { 'Content-Type': 'application/json' },
+//           body: JSON.stringify({ email: user.email }),
+//         }
+//       )
+
+//       const data = await response.json()
+
+//       if (data.success) {
+//         setMessageData({
+//           messagesSent: 0,
+//           messageLimit: 10,
+//           planStatus: 'inactive',
+//         })
+//       } else {
+//         console.error(data.error || 'Failed to cancel subscription')
+//       }
+//     } catch (error) {
+//       console.error('Error cancelling subscription:', error)
+//     } finally {
+//       setLoading(false)
+//     }
+//   }
+
+//   return (
+//     <div className="bg-white rounded-lg p-6 border border-gray-100">
+//       <div className="flex items-center gap-2 mb-2">
+//         <CreditCard className="h-5 w-5 text-pink-600" />
+//         <h2 className="text-xl font-semibold">Subscription Plan</h2>
+//       </div>
+//       <p className="text-gray-600 mb-6">Manage your subscription and usage</p>
+
+//       <div className="space-y-8">
+//         <div className="flex justify-between items-start">
+//           <div>
+//             <h3 className="font-semibold text-lg">{planLabel}</h3>
+//             <p className="text-gray-600">
+//               {messageData.planStatus === 'activate'
+//                 ? 'Full access to premium insights and extended usage'
+//                 : 'Basic access to relationship insights'}
+//             </p>
+//           </div>
+//           <div className="bg-pink-100 text-pink-600 px-3 py-1 rounded-full text-sm">
+//             {planLabel}
+//           </div>
+//         </div>
+
+//         <div>
+//           <div className="flex justify-between mb-1">
+//             <span className="text-sm text-gray-600">
+//               Message usage ({messageData.messagesSent}/
+//               {messageData.messageLimit})
+//             </span>
+//             <span className="text-sm text-gray-600">{usagePercentage}%</span>
+//           </div>
+//           <div className="w-full bg-gray-200 rounded-full h-2">
+//             <div
+//               className="bg-pink-600 h-2 rounded-full"
+//               style={{ width: `${usagePercentage}%` }}
+//             ></div>
+//           </div>
+//         </div>
+
+//         <div>
+//           <h3 className="font-semibold text-lg mb-4">Plan Benefits</h3>
+//           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+//             {benefits.map((benefit, index) => (
+//               <div key={index} className="flex items-center gap-2">
+//                 <CheckCircle className="h-5 w-5 text-pink-600" />
+//                 <span>{benefit}</span>
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+
+//         {messageData.planStatus === 'activate' ? (
+//           <button
+//             onClick={handleCancelSubscription}
+//             disabled={loading}
+//             className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-4 rounded-md transition-colors flex items-center justify-center"
+//           >
+//             {loading ? 'Cancelling...' : 'Cancel Subscription'}
+//           </button>
+//         ) : (
+//           <button
+//             onClick={() => navigate('/upgrade')}
+//             className="w-full bg-pink-600 hover:bg-pink-700 text-white py-3 px-4 rounded-md transition-colors flex items-center justify-center"
+//           >
+//             Upgrade Your Plan
+//             <ArrowRight className="ml-2 h-5 w-5" />
+//           </button>
+//         )}
+
+//         <div className="pt-4 border-t">
+//           <h3 className="font-semibold text-lg mb-2">Message Usage</h3>
+//           <p className="text-gray-600 mb-4">
+//             Your usage history for the current billing cycle
+//           </p>
+
+//           <div className="flex justify-between items-center mb-1">
+//             <div>
+//               <h4 className="font-medium">Total Messages</h4>
+//               <p className="text-sm text-gray-600">
+//                 {messageData.messagesSent} out of {messageData.messageLimit}{' '}
+//                 messages used
+//               </p>
+//             </div>
+//             <div className="text-right">
+//               <span className="text-xl font-semibold">
+//                 {messageData.messageLimit - messageData.messagesSent}
+//               </span>
+//               <p className="text-sm text-gray-600">Messages remaining</p>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   )
+// }
+
+
+import { CreditCard, CheckCircle, ArrowRight, AlertCircle } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 export default function Subscription() {
-  // This could come from an API call in a real app
-  const subscriptionData = {
-    plan: "Free Plan",
-    description: "Basic access to relationship insights",
-    messageUsage: 0,
-    messageLimit: 10,
-    benefits: ["10 messages per month", "Text-based insights", "Basic relationship analysis"],
+  const [messageData, setMessageData] = useState({
+    messagesSent: 0,
+    messageLimit: 0,
+    planStatus: 'inactive', // 'inactive', 'activate', or 'finished'
+  })
+
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const userFromLocalStorage = JSON.parse(
+      localStorage.getItem('user') || '{}'
+    )
+    setUser(userFromLocalStorage)
+
+    const fetchMessageData = async () => {
+      try {
+        if (userFromLocalStorage?.email) {
+          const response = await fetch(
+            `${import.meta.env.VITE_BACKEND_URL}/check-plan?email=${
+              userFromLocalStorage.email
+            }`
+          )
+          const data = await response.json()
+
+          if (data.success) {
+            setMessageData({
+              messagesSent: data.messagesSent || 0,
+              messageLimit:
+                data.messageLimit || (data.planStatus === 'finished' ? 0 : 10),
+              planStatus: data.planStatus || 'inactive',
+            })
+          } else if (data.planStatus === 'finished') {
+            setMessageData({
+              messagesSent: 0,
+              messageLimit: 0,
+              planStatus: 'finished',
+            })
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching message data:', error)
+      }
+    }
+
+    fetchMessageData()
+  }, [])
+
+  const usagePercentage =
+    messageData.messageLimit > 0
+      ? Math.min(
+          (messageData.messagesSent / messageData.messageLimit) * 100,
+          100
+        ).toFixed(2)
+      : 0
+
+  const getPlanLabel = () => {
+    switch (messageData.planStatus) {
+      case 'activate':
+        return 'Pro Plan'
+      case 'finished':
+        return 'Plan Expired'
+      default:
+        return 'Free Plan'
+    }
   }
 
-  const usagePercentage = (subscriptionData.messageUsage / subscriptionData.messageLimit) * 100
+  const getPlanBenefits = () => {
+    switch (messageData.planStatus) {
+      case 'activate':
+        return [
+          '260 messages per month',
+          'Advanced insights',
+          'Priority support',
+        ]
+      case 'finished':
+        return [
+          'Plan has expired',
+          'Upgrade to continue using premium features',
+          'Your usage has been reset',
+        ]
+      default:
+        return [
+          '10 messages per month',
+          'Text-based insights',
+          'Basic relationship analysis',
+        ]
+    }
+  }
+
+  const handleCancelSubscription = async () => {
+    if (!user?.email) return
+    setLoading(true)
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/finish-plan`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: user.email }),
+        }
+      )
+
+      const data = await response.json()
+
+      if (data.success) {
+        setMessageData({
+          messagesSent: 0,
+          messageLimit: 0,
+          planStatus: 'finished',
+        })
+      } else {
+        console.error(data.error || 'Failed to cancel subscription')
+      }
+    } catch (error) {
+      console.error('Error cancelling subscription:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="bg-white rounded-lg p-6 border border-gray-100">
@@ -23,54 +530,124 @@ export default function Subscription() {
       <div className="space-y-8">
         <div className="flex justify-between items-start">
           <div>
-            <h3 className="font-semibold text-lg">{subscriptionData.plan}</h3>
-            <p className="text-gray-600">{subscriptionData.description}</p>
+            <h3 className="font-semibold text-lg">{getPlanLabel()}</h3>
+            <p className="text-gray-600">
+              {messageData.planStatus === 'activate'
+                ? 'Full access to premium insights and extended usage'
+                : messageData.planStatus === 'finished'
+                ? 'Your subscription plan has expired'
+                : 'Basic access to relationship insights'}
+            </p>
           </div>
-          <div className="bg-pink-100 text-pink-600 px-3 py-1 rounded-full text-sm">Free Plan</div>
+          <div
+            className={`px-3 py-1 rounded-full text-sm ${
+              messageData.planStatus === 'activate'
+                ? 'bg-pink-100 text-pink-600'
+                : messageData.planStatus === 'finished'
+                ? 'bg-amber-100 text-amber-600'
+                : 'bg-gray-100 text-gray-600'
+            }`}
+          >
+            {getPlanLabel()}
+          </div>
         </div>
 
-        <div>
-          <div className="flex justify-between mb-1">
-            <span className="text-sm text-gray-600">
-              Message usage ({subscriptionData.messageUsage}/{subscriptionData.messageLimit})
-            </span>
-            <span className="text-sm text-gray-600">{usagePercentage}%</span>
+        {messageData.planStatus === 'finished' ? (
+          <div className="bg-amber-50 border border-amber-200 rounded-md p-4 flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
+            <div>
+              <h4 className="font-medium text-amber-800">Plan Expired</h4>
+              <p className="text-amber-700 text-sm">
+                Your subscription plan has ended. Upgrade to continue using
+                premium features.
+              </p>
+            </div>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div className="bg-pink-600 h-2 rounded-full" style={{ width: `${usagePercentage}%` }}></div>
+        ) : (
+          <div>
+            <div className="flex justify-between mb-1">
+              <span className="text-sm text-gray-600">
+                Message usage ({messageData.messagesSent}/
+                {messageData.messageLimit || '0'})
+              </span>
+              <span className="text-sm text-gray-600">{usagePercentage}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className={`h-2 rounded-full ${
+                  messageData.planStatus === 'activate'
+                    ? 'bg-pink-600'
+                    : 'bg-gray-400'
+                }`}
+                style={{ width: `${usagePercentage}%` }}
+              ></div>
+            </div>
           </div>
-        </div>
+        )}
 
         <div>
           <h3 className="font-semibold text-lg mb-4">Plan Benefits</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {subscriptionData.benefits.map((benefit, index) => (
+            {getPlanBenefits().map((benefit, index) => (
               <div key={index} className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-pink-600" />
+                <CheckCircle
+                  className={`h-5 w-5 ${
+                    messageData.planStatus === 'activate'
+                      ? 'text-pink-600'
+                      : messageData.planStatus === 'finished'
+                      ? 'text-amber-500'
+                      : 'text-gray-500'
+                  }`}
+                />
                 <span>{benefit}</span>
               </div>
             ))}
           </div>
         </div>
 
-        <button className="w-full bg-pink-600 hover:bg-pink-700 text-white py-3 px-4 rounded-md transition-colors flex items-center justify-center">
-          Upgrade Your Plan
-          <ArrowRight className="ml-2 h-5 w-5" />
-        </button>
+        {messageData.planStatus === 'activate' ? (
+          <button
+            onClick={handleCancelSubscription}
+            disabled={loading}
+            className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 px-4 rounded-md transition-colors flex items-center justify-center"
+          >
+            {loading ? 'Cancelling...' : 'Cancel Subscription'}
+          </button>
+        ) : (
+          <button
+            onClick={() => navigate('/upgrade')}
+            className="w-full bg-pink-600 hover:bg-pink-700 text-white py-3 px-4 rounded-md transition-colors flex items-center justify-center"
+          >
+            {messageData.planStatus === 'finished'
+              ? 'Renew Your Plan'
+              : 'Upgrade Your Plan'}
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </button>
+        )}
 
         <div className="pt-4 border-t">
           <h3 className="font-semibold text-lg mb-2">Message Usage</h3>
-          <p className="text-gray-600 mb-4">Your usage history for the current billing cycle</p>
+          <p className="text-gray-600 mb-4">
+            {messageData.planStatus === 'finished'
+              ? 'Your previous usage history'
+              : 'Your usage history for the current billing cycle'}
+          </p>
 
           <div className="flex justify-between items-center mb-1">
             <div>
               <h4 className="font-medium">Total Messages</h4>
               <p className="text-sm text-gray-600">
-                {subscriptionData.messageUsage} out of {subscriptionData.messageLimit} messages used
+                {messageData.messagesSent} out of{' '}
+                {messageData.messageLimit || '0'} messages used
               </p>
             </div>
             <div className="text-right">
-              <span className="text-xl font-semibold">{subscriptionData.messageLimit}</span>
+              <span className="text-xl font-semibold">
+                {Math.max(
+                  messageData.messageLimit - messageData.messagesSent,
+                  0
+                )}
+              </span>
               <p className="text-sm text-gray-600">Messages remaining</p>
             </div>
           </div>
@@ -79,4 +656,3 @@ export default function Subscription() {
     </div>
   )
 }
-
