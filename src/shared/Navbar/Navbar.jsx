@@ -55,7 +55,7 @@ export default function Navbar() {
     fetchUserPlan()
   }, [user?.email])
 
-  console.log("jhgjbjb",userPlan)
+  console.log(" from Navbar.jsx",userPlan)
 
   
 
@@ -104,7 +104,7 @@ export default function Navbar() {
             className="flex items-center gap-2 text-xl font-bold text-[#C62553]"
           >
             <Heart className="h-5 w-5" />
-            <span>HeartBridge</span>
+            <span>RelationshipAi</span>
           </Link>
 
           {/* Desktop navigation */}
@@ -215,7 +215,7 @@ export default function Navbar() {
             className="flex items-center gap-2 text-xl font-semibold text-[#C62553]"
           >
             <Heart className="h-5 w-5 fill-[#C62553]" />
-            <span>HeartBridge</span>
+            <span>Relationship Ai</span>
           </Link>
           <button
             onClick={toggleMenu}

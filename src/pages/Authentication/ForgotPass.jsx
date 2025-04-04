@@ -36,7 +36,9 @@ export default function ForgotPass() {
     <div className="flex min-h-[calc(100vh-66px)] items-center justify-center p-4">
       <div className="w-full max-w-md rounded-lg border border-gray-100 bg-white p-8 shadow-md">
         <div className="mb-6 text-center">
-          <h1 className="text-2xl font-semibold text-[#C62553]">HeartBridge</h1>
+          <h1 className="text-2xl font-semibold text-[#C62553]">
+            Relationship Ai
+          </h1>
         </div>
 
         <h2 className="mb-2 text-center text-2xl font-bold text-gray-900">

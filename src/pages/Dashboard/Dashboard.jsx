@@ -122,7 +122,7 @@ const DashboardLayout = () => {
             <Link to="/" className="flex items-center space-x-2">
               <Heart className="h-5 w-5 text-pink-500" />
               <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-pink-600 bg-clip-text text-transparent">
-                HeartBridge
+                Relationship Ai
               </span>
             </Link>
           </div>
@@ -212,10 +212,8 @@ const DashboardLayout = () => {
         {/* Main Content */}
         <main className="flex-1 p-6">
           <div className="max-w-7xl mx-auto space-y-8">
-
             {/* Content */}
-            <div
-            >
+            <div>
               <Outlet />
             </div>
           </div>

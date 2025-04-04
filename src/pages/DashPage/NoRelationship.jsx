@@ -89,7 +89,9 @@ const NoRelationship = () => {
   if (!relationships.length) {
     return (
       <div className="flex flex-col items-center justify-center h-full px-4 text-center">
-        <h1 className="text-4xl font-bold text-[#C62553] mb-4">HeartBridge</h1>
+        <h1 className="text-4xl font-bold text-[#C62553] mb-4">
+          Relationship Ai
+        </h1>
         <p className="text-gray-500 mb-8 text-xl">
           What relationship would you like to discuss?
         </p>
@@ -100,9 +102,9 @@ const NoRelationship = () => {
           Create Your First Relationship
         </Link>
       </div>
-    );
+    )
   }
-  console.log("_____",relationships)
+  console.log("NO relatinship jsx page ===",relationships)
 
   return (
     <div>

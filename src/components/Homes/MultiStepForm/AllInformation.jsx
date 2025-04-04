@@ -1,7 +1,9 @@
 import React from "react";
+import { redirect } from "react-router-dom";
 // import { toast } from "react-toastify";
 
 const AllInformation = ({ data, handlePreviousStep }) => {
+  console.log("from Allinformation.jsx------",data);
   return (
     <div className=" p-1 md:p-6  mx-auto pb-10">
       <h2 className="text-3xl font-bold leading-[36px] text-[#c02351] text-center pb-6">
@@ -98,6 +100,7 @@ const AllInformation = ({ data, handlePreviousStep }) => {
         </button>
         <button
           type="submit"
+        
           className="bg-rose-500 text-white py-2 px-5 rounded-lg text-base font-semibold leading-normal"
         >
           Submit
