@@ -20,6 +20,7 @@ import VerifyEmailbytoken from '../pages/Authentication/VerifyEmailbytoken'
 import RelationshipDetail from '../pages/RelationshipDetail'
 import Message from '../pages/Message'
 import ForgetPass from '../pages/Authentication/ForgotPass'
+import ResetPassword from '../pages/Authentication/ResetPassword'
 
 const router = createBrowserRouter([
   {
@@ -68,12 +69,29 @@ const router = createBrowserRouter([
       },
       {
         path: '/relationship',
-        element: <RelationshipDetail />,
+        element: (
+          <PrivateRoute>
+            <RelationshipDetail />,
+          </PrivateRoute>
+        ),
       },
       {
         path: '/verify-email',
-        element: <VerifyEmailbytoken />,
+        element: (
+          <PublicRoute>
+            <VerifyEmailbytoken />
+          </PublicRoute>
+        ),
       },
+      {
+        path: '/password-reset',
+        element: (
+          <PublicRoute>
+            <ResetPassword />
+          </PublicRoute>
+        ),
+      },
+
       {
         path: 'success',
         element: (
