@@ -121,7 +121,7 @@ const MessageBubble = ({ message, isOwnMessage }) => {
         <div className="flex justify-between items-center mt-2">
           <p className="text-xs text-gray-500">{formattedTime}</p>
           {!isOwnMessage && (
-            <p className="text-xs text-gray-500 ml-2">Relationship AI</p>
+            <p className="text-xs text-gray-500 ml-2">My Relationship AI</p>
           )}
         </div>
       </div>

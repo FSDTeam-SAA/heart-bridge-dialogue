@@ -37,7 +37,7 @@ export default function ForgotPass() {
       <div className="w-full max-w-md rounded-lg border border-gray-100 bg-white p-8 shadow-md">
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-semibold text-[#C62553]">
-            Relationship Ai
+            My Relationship Ai
           </h1>
         </div>
 

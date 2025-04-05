@@ -65,7 +65,7 @@ const MessageInput = ({ onSendMessage, disabled = false }) => {
       </div>
 
       <p className="text-xs text-gray-500 mt-2 ml-2">
-        Relationship Ai provides research-based relationship insights
+        My Relationship Ai provides research-based relationship insights
       </p>
     </form>
   )

@@ -122,7 +122,7 @@ const DashboardLayout = () => {
             <Link to="/" className="flex items-center space-x-2">
               <Heart className="h-5 w-5 text-pink-500" />
               <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-pink-600 bg-clip-text text-transparent">
-                Relationship Ai
+                My Relationship Ai
               </span>
             </Link>
           </div>
