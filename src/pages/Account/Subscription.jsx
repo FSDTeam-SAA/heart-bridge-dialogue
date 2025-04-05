@@ -1,4 +1,3 @@
-
 // import { CreditCard, CheckCircle, ArrowRight } from 'lucide-react'
 // import { useEffect, useState } from 'react'
 // import { useNavigate } from 'react-router-dom'
@@ -188,7 +187,6 @@
 //     </div>
 //   )
 // }
-
 
 // import { CreditCard, CheckCircle, ArrowRight } from 'lucide-react'
 // import { useEffect, useState } from 'react'
@@ -390,7 +388,6 @@
 //     </div>
 //   )
 // }
-
 
 import { CreditCard, CheckCircle, ArrowRight, AlertCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -594,6 +591,8 @@ export default function Subscription() {
                   className={`h-5 w-5 ${
                     messageData.planStatus === 'activate'
                       ? 'text-pink-600'
+                      : messageData.planStatus === 'free_plan'
+                      ? 'text-gray-500'
                       : messageData.planStatus === 'finished'
                       ? 'text-amber-500'
                       : 'text-gray-500'
@@ -613,6 +612,14 @@ export default function Subscription() {
           >
             {loading ? 'Cancelling...' : 'Cancel Subscription'}
           </button>
+        ) : messageData.planStatus === 'free_plan' ? (
+          <button
+            onClick={() => navigate('/upgrade')}
+            className="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-3 px-4 rounded-md transition-colors flex items-center justify-center"
+          >
+            Upgrade to Unlock More Features
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </button>
         ) : (
           <button
             onClick={() => navigate('/upgrade')}
@@ -624,6 +631,36 @@ export default function Subscription() {
             <ArrowRight className="ml-2 h-5 w-5" />
           </button>
         )}
+
+        <div className="pt-4 border-t">
+          <h3 className="font-semibold text-lg mb-2">Message Usage</h3>
+          <p className="text-gray-600 mb-4">
+            {messageData.planStatus === 'finished'
+              ? 'Your previous usage history'
+              : messageData.planStatus === 'free_plan'
+              ? 'You are on the free plan. Upgrade to unlock full access.'
+              : 'Your usage history for the current billing cycle'}
+          </p>
+
+          <div className="flex justify-between items-center mb-1">
+            <div>
+              <h4 className="font-medium">Total Messages</h4>
+              <p className="text-sm text-gray-600">
+                {messageData.messagesSent} out of{' '}
+                {messageData.messageLimit || '0'} messages used
+              </p>
+            </div>
+            <div className="text-right">
+              <span className="text-xl font-semibold">
+                {Math.max(
+                  messageData.messageLimit - messageData.messagesSent,
+                  0
+                )}
+              </span>
+              <p className="text-sm text-gray-600">Messages remaining</p>
+            </div>
+          </div>
+        </div>
 
         <div className="pt-4 border-t">
           <h3 className="font-semibold text-lg mb-2">Message Usage</h3>
