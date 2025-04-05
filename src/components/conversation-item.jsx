@@ -1,4 +1,3 @@
-'use client'
 import { MessageCircle, Clock } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 

@@ -48,18 +48,6 @@ const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-      // {
-      //   path: '/verify-email',
-      //   element: (
-      //     <PublicRoute>
-      //       <VerifyEmail />
-      //     </PublicRoute>
-      //   ),
-      // },
-      // {
-      //   path: '/messages',
-      //   element: <MessagePage />,
-      // },
       {
         path: '/messages/:id',
         element: (

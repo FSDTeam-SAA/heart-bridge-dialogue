@@ -1,5 +1,3 @@
-'use client'
-
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { ref, onValue, push, set } from 'firebase/database'
@@ -233,27 +231,82 @@ const Message = () => {
       setMessageLimit(sendData.remainingMessages + sendData.messagesSent)
 
       const prompt = userQuestion
-        ? `Analyze the romantic relationship between ${relationship.personName1} and ${relationship.personName2}. 
-   Given the context below, provide a research-backed response in 50-70 words to address the following question: 
-   "${userQuestion}"  
+        ? `You are an expert in romantic relationships, attachment styles, communication, psychology and everything around this topic. You only quote scientific backed research, you do not have any opinions, and you do not fabricate any of your responses.
 
-   Relationship details:  
-   - ${relationship.personName1}: ${relationship.attachmentStyle1} attachment, ${relationship.loveLanguage1} love language, ${relationship.communicationStyle1} communication style, ${relationship.conflictStyle1} conflict style  
-   - ${relationship.personName2}: ${relationship.attachmentStyle2} attachment, ${relationship.loveLanguage2} love language, ${relationship.communicationStyle2} communication style, ${relationship.conflictStyle2} conflict style  
-   - Relationship stage: ${relationship.relationshipState}  
-   - Length of relationship: ${relationship.relationshipLength}  
-   - Living situation: ${relationship.livingStatus}  
+Today, we are going to help ${relationship.personName1} and ${relationship.personName2}. This is what you need to know:
 
-   Ensure the response is strictly based on psychological and relationship research without opinions or fabrications.`
-        : `Provide a concise, research-backed 100-150 word analysis of the romantic relationship between ${relationship.personName1} and ${relationship.personName2}, considering their unique profiles:  
+Relationship Title: ${relationship.relationshipTitle}
 
-   - ${relationship.personName1}: ${relationship.attachmentStyle1} attachment, ${relationship.loveLanguage1} love language, ${relationship.communicationStyle1} communication style, ${relationship.conflictStyle1} conflict style  
-   - ${relationship.personName2}: ${relationship.attachmentStyle2} attachment, ${relationship.loveLanguage2} love language, ${relationship.communicationStyle2} communication style, ${relationship.conflictStyle2} conflict style  
-   - Relationship stage: ${relationship.relationshipState}  
-   - Length of relationship: ${relationship.relationshipLength}  
-   - Living situation: ${relationship.livingStatus}  
+Length of relationship: ${relationship.relationshipLength}
 
-   The response must be rooted in scientific research on relationships, attachment theory, communication, and conflict resolution.`
+Living status: ${relationship.livingStatus}
+
+Relationship stage: ${relationship.relationshipState}
+
+Person 1 perspective: ${relationship.person1Perspective}
+
+Person 2 perspective: ${relationship.person2Perspective}
+
+Person 1 Love Language: ${relationship.loveLanguage1}
+
+Person 2 Love Language: ${relationship.loveLanguage2}
+
+Person 1 Communication Style: ${relationship.communicationStyle1}
+
+Person 2 Communication Style: ${relationship.communicationStyle2}
+
+Person 1 Conflict Style: ${relationship.conflictStyle1}
+
+Person 2 Conflict Style: ${relationship.conflictStyle2}
+
+Person 1 Attachment Style: ${relationship.attachmentStyle1}
+
+Person 2 Attachment Style: ${relationship.attachmentStyle2}
+
+Remember, using all of the above information, your job is to quote scientific backed research to give ${relationship.personName1} and ${relationship.personName2} the best chance of flourishing in a romantic relationship.
+
+But before you do this – ask as many questions as you need to, to fully understand all of the context within their romantic relationship.
+
+Please continue with all of the questions you need to generate your scientific, research backed response.
+
+"${userQuestion}"`
+        : `You are an expert in romantic relationships, attachment styles, communication, psychology and everything around this topic. You only quote scientific backed research, you do not have any opinions, and you do not fabricate any of your responses.
+
+Today, we are going to help ${relationship.personName1} and ${relationship.personName2}. This is what you need to know:
+
+Relationship Title: ${relationship.relationshipTitle}
+
+Length of relationship: ${relationship.relationshipLength}
+
+Living status: ${relationship.livingStatus}
+
+Relationship stage: ${relationship.relationshipState}
+
+Person 1 perspective: ${relationship.person1Perspective}
+
+Person 2 perspective: ${relationship.person2Perspective}
+
+Person 1 Love Language: ${relationship.loveLanguage1}
+
+Person 2 Love Language: ${relationship.loveLanguage2}
+
+Person 1 Communication Style: ${relationship.communicationStyle1}
+
+Person 2 Communication Style: ${relationship.communicationStyle2}
+
+Person 1 Conflict Style: ${relationship.conflictStyle1}
+
+Person 2 Conflict Style: ${relationship.conflictStyle2}
+
+Person 1 Attachment Style: ${relationship.attachmentStyle1}
+
+Person 2 Attachment Style: ${relationship.attachmentStyle2}
+
+Remember, using all of the above information, your job is to quote scientific backed research to give ${relationship.personName1} and ${relationship.personName2} the best chance of flourishing in a romantic relationship.
+
+But before you do this – ask as many questions as you need to, to fully understand all of the context within their romantic relationship.
+
+Please continue with all of the questions you need to generate your scientific, research backed response. And make sure to give me markdown formate `
 
       const openAIResponse = await fetch(
         'https://api.openai.com/v1/chat/completions',
@@ -273,7 +326,8 @@ const Message = () => {
       )
 
       const data = await openAIResponse.json()
-      const aiMessage =
+      console.log("from ai response data", data)
+      const aiMessage = // Hide history when creating a new conversation
         data.choices[0]?.message?.content || "I couldn't generate a response."
 
       // Create AI message object
@@ -336,7 +390,8 @@ const Message = () => {
     // Set as current conversation
     setCurrentConversationId(conversationId)
     setMessages([])
-    setShowHistory(false) // Hide history when creating a new conversation
+    // Hide history when creating a new conversation
+    setShowHistory(false)
 
     // Update URL to include the new conversation ID
     navigate(`/messages/${id}?conversation=${conversationId}`, {
@@ -359,7 +414,8 @@ const Message = () => {
     navigate(`/messages/${id}?conversation=${conversationId}`, {
       replace: true,
     })
-    setShowHistory(false) // Hide history after selecting a conversation
+    // Hide history after selecting a conversation
+    setShowHistory(false)
   }
 
   const handleSuggestedQuestion = (question) => {

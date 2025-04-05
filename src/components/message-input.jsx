@@ -1,5 +1,3 @@
-'use client'
-
 import { useState } from 'react'
 import { Send, Smile, Paperclip } from 'lucide-react'
  

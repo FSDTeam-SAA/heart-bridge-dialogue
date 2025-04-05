@@ -1,8 +1,8 @@
 import { CheckIcon } from '../shared/CheckIcon'
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import { auth, db } from '../config/firebaseConfig' // Firebase config
-import { ref, set } from 'firebase/database' // Import Realtime Database functions
+import { auth, db } from '../config/firebaseConfig' 
+import { ref, set } from 'firebase/database' 
 import { useNavigate } from 'react-router-dom'
 
 const Upgrade = () => {
