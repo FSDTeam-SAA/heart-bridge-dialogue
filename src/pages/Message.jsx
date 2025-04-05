@@ -1149,85 +1149,7 @@ const Message = () => {
       setMessagesSent(sendData.messagesSent)
       setMessageLimit(sendData.remainingMessages + sendData.messagesSent)
 
-      // Updated prompt with markdown formatting
-//       const prompt = userQuestion
-//         ? `You are an expert in romantic relationships, attachment styles, communication, psychology and everything around this topic. You only quote scientific backed research, you do not have any opinions, and you do not fabricate any of your responses.
-
-// Today, we are going to help ${relationship.personName1} and ${relationship.personName2}. This is what you need to know:
-
-// Relationship Title: ${relationship.relationshipTitle}
-
-// Length of relationship: ${relationship.relationshipLength}
-
-// Living status: ${relationship.livingStatus}
-
-// Relationship stage: ${relationship.relationshipState}
-
-// Person 1 perspective: ${relationship.person1Perspective}
-
-// Person 2 perspective: ${relationship.person2Perspective}
-
-// Person 1 Love Language: ${relationship.loveLanguage1}
-
-// Person 2 Love Language: ${relationship.loveLanguage2}
-
-// Person 1 Communication Style: ${relationship.communicationStyle1}
-
-// Person 2 Communication Style: ${relationship.communicationStyle2}
-
-// Person 1 Conflict Style: ${relationship.conflictStyle1}
-
-// Person 2 Conflict Style: ${relationship.conflictStyle2}
-
-// Person 1 Attachment Style: ${relationship.attachmentStyle1}
-
-// Person 2 Attachment Style: ${relationship.attachmentStyle2}
-
-// Remember, using all of the above information, your job is to quote scientific backed research to give ${relationship.personName1} and ${relationship.personName2} the best chance of flourishing in a romantic relationship.
-
-// But before you do this – ask as many questions as you need to, to fully understand all of the context within their romantic relationship.
-
-// Please continue with all of the questions you need to generate your scientific, research backed response.
-
-// "${userQuestion}"`
-//         : `You are an expert in romantic relationships, attachment styles, communication, psychology and everything around this topic. You only quote scientific backed research, you do not have any opinions, and you do not fabricate any of your responses.
-
-// Today, we are going to help ${relationship.personName1} and ${relationship.personName2}. This is what you need to know:
-
-// Relationship Title: ${relationship.relationshipTitle}
-
-// Length of relationship: ${relationship.relationshipLength}
-
-// Living status: ${relationship.livingStatus}
-
-// Relationship stage: ${relationship.relationshipState}
-
-// Person 1 perspective: ${relationship.person1Perspective}
-
-// Person 2 perspective: ${relationship.person2Perspective}
-
-// Person 1 Love Language: ${relationship.loveLanguage1}
-
-// Person 2 Love Language: ${relationship.loveLanguage2}
-
-// Person 1 Communication Style: ${relationship.communicationStyle1}
-
-// Person 2 Communication Style: ${relationship.communicationStyle2}
-
-// Person 1 Conflict Style: ${relationship.conflictStyle1}
-
-// Person 2 Conflict Style: ${relationship.conflictStyle2}
-
-// Person 1 Attachment Style: ${relationship.attachmentStyle1}
-
-// Person 2 Attachment Style: ${relationship.attachmentStyle2}
-
-// Remember, using all of the above information, your job is to quote scientific backed research to give ${relationship.personName1} and ${relationship.personName2} the best chance of flourishing in a romantic relationship.
-
-// But before you do this – ask as many questions as you need to, to fully understand all of the context within their romantic relationship.
-
-// Please continue with all of the questions you need to generate your scientific, research backed response. Important = and give response markdown formate for batter readability`
-
+     
 const prompt = userQuestion
   ? `**Role**: You are an expert relationship psychologist specializing in attachment theory, communication patterns, and conflict resolution. Your responses must be:
   - Based ONLY on peer-reviewed scientific research
@@ -1310,7 +1232,7 @@ const prompt = userQuestion
             model: 'gpt-3.5-turbo',
             messages: [{ role: 'user', content: prompt }],
             temperature: 0.7,
-            max_tokens: 100,
+            max_tokens: 1000,
           }),
         }
       )
