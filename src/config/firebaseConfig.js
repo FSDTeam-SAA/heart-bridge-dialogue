@@ -16,5 +16,5 @@ const firebaseConfig = {
 
 
 export const app = initializeApp(firebaseConfig)
-export const db = getDatabase(app) // ✅ Correct for Realtime Database
+export const db = getDatabase(app) 
 export const auth = getAuth(app)

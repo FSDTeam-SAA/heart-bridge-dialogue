@@ -1,72 +1,111 @@
-import {
-  ArrowLeft,
-  CircleAlert,
-  Clock,
-  Gift,
-  Heart,
-  House,
-  MessageCircle,
-  Shield,
-  User,
-  Send,
-} from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { ref, onValue } from 'firebase/database'
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
+import { ref, onValue, push, set } from 'firebase/database'
 import { db } from '../config/firebaseConfig'
-import { useNavigate, useParams } from 'react-router-dom'
+import { MessageCircle, History, Plus } from 'lucide-react'
+import MessageBubble from '../components/message-bubble'
+import RelationshipHeader from '../components/relationship-header'
+import MessageInput from '../components/message-input'
+import SuggestedQuestions from '../components/suggested-questions'
+import ConversationHistory from '../components/conversation-history'
 
 const Message = () => {
-  const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
   const { id } = useParams()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const conversationParam = searchParams.get('conversation')
+  const isNewConversation = searchParams.get('new') === 'true'
 
-  // All states
-  const [relationships, setRelationships] = useState([])
-  const [loading, setLoading] = useState(true)
   const [messages, setMessages] = useState([])
-  const [inputMessage, setInputMessage] = useState('')
+  const [conversations, setConversations] = useState([])
+  const [currentConversationId, setCurrentConversationId] = useState(null)
+  const [relationship, setRelationship] = useState(null)
   const [isAiTyping, setIsAiTyping] = useState(false)
-  const [response, setResponse] = useState('')
   const [messageLimit, setMessageLimit] = useState(null)
   const [messagesSent, setMessagesSent] = useState(0)
   const [limitReached, setLimitReached] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
+  const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
-  // get data form firebase
+  // Load relationship data
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('user'))
 
-    if (!user?.uid) {
-      setLoading(false)
-      return
-    }
+    if (!user?.uid || !id) return
 
     const relationshipsRef = ref(db, `users/${user.uid}/formSubmissions`)
     const unsubscribe = onValue(relationshipsRef, (snapshot) => {
       const data = snapshot.val()
-      const relationshipsArray = data
-        ? Object.entries(data).map(([key, value]) => ({
-            id: key,
-            ...value,
-          }))
-        : []
-      setRelationships(relationshipsArray)
-      setLoading(false)
+      if (data) {
+        const relationshipsArray = Object.entries(data).map(([key, value]) => ({
+          id: key,
+          ...value,
+        }))
+
+        const currentRelationship = relationshipsArray.find(
+          (rel) => rel.id === id
+        )
+        setRelationship(currentRelationship)
+      }
     })
 
     return () => unsubscribe()
-  }, [])
+  }, [id])
 
-  const singleRelationship = relationships.find(
-    (relationship) => relationship.id === id
-  )
-
-  // Generate initial AI message on first load
+  // Load conversations
   useEffect(() => {
-    if (singleRelationship && messages.length === 0) {
-      generateAiResponse()
-    }
-  }, [singleRelationship])
+    const user = JSON.parse(localStorage.getItem('user'))
+
+    if (!user?.uid) return
+
+    // Load all conversations for this relationship
+    const conversationsRef = ref(db, `users/${user.uid}/conversations`)
+    const unsubscribe = onValue(conversationsRef, (snapshot) => {
+      const data = snapshot.val()
+      const conversationsArray = data
+        ? Object.entries(data)
+            .map(([key, value]) => ({
+              id: key,
+              ...value,
+            }))
+            .filter((conv) => conv.relationshipId === id)
+            .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+        : []
+
+      setConversations(conversationsArray)
+
+      // Check if we should create a new conversation
+      if (isNewConversation) {
+        createNewConversation()
+      }
+      // If conversation ID is in URL, load that conversation
+      else if (
+        conversationParam &&
+        conversationsArray.some((conv) => conv.id === conversationParam)
+      ) {
+        setCurrentConversationId(conversationParam)
+        loadConversationMessages(conversationParam)
+      }
+      // Otherwise use most recent conversation or create new one
+      else if (conversationsArray.length > 0) {
+        setCurrentConversationId(conversationsArray[0].id)
+        loadConversationMessages(conversationsArray[0].id)
+      } else if (relationship) {
+        // Create a new conversation if none exists
+        createNewConversation()
+      }
+    })
+
+    return () => unsubscribe()
+  }, [id, conversationParam, isNewConversation, relationship])
+
+  // Check message limit
+  useEffect(() => {
+    checkMessageLimit()
+  }, [])
 
   const checkMessageLimit = async () => {
     try {
@@ -97,8 +136,68 @@ const Message = () => {
     }
   }
 
-  const generateAiResponse = async (userQuestion = '') => {
-    if (!singleRelationship || limitReached) return
+  const loadConversationMessages = (conversationId) => {
+    const user = JSON.parse(localStorage.getItem('user'))
+
+    if (!user?.uid || !conversationId) return
+
+    const messagesRef = ref(
+      db,
+      `users/${user.uid}/conversations/${conversationId}/messages`
+    )
+
+    onValue(messagesRef, (snapshot) => {
+      const data = snapshot.val()
+      const messagesArray = data
+        ? Object.entries(data).map(([key, value]) => ({
+            id: key,
+            ...value,
+          }))
+        : []
+
+      // Sort messages by timestamp
+      messagesArray.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0))
+
+      setMessages(messagesArray)
+    })
+  }
+
+  const handleSendMessage = async (text) => {
+    if (limitReached) return
+
+    const user = JSON.parse(localStorage.getItem('user'))
+    if (!user?.uid) return
+
+    // Ensure we have a conversation to add messages to
+    let convId = currentConversationId
+    if (!convId) {
+      convId = await createNewConversation()
+    }
+
+    // Add user message to Firebase
+    const userMessage = {
+      text: text,
+      isAi: false,
+      timestamp: Date.now(),
+      displayTime: new Date().toLocaleTimeString(),
+    }
+
+    const messagesRef = ref(
+      db,
+      `users/${user.uid}/conversations/${convId}/messages`
+    )
+
+    await push(messagesRef, userMessage)
+
+    // Generate AI response
+    await generateAiResponse(text, convId)
+  }
+
+  const generateAiResponse = async (
+    userQuestion = '',
+    conversationId = null
+  ) => {
+    if (!relationship || limitReached) return
 
     setIsAiTyping(true)
 
@@ -106,6 +205,9 @@ const Message = () => {
       // First check if user can send a message
       const user = JSON.parse(localStorage.getItem('user'))
       if (!user?.email) return
+
+      // Use the current conversation ID or the one provided
+      const convId = conversationId || currentConversationId
 
       // Record the message with the backend
       const sendResponse = await fetch(`${BACKEND_URL}/api/send-message`, {
@@ -131,27 +233,27 @@ const Message = () => {
       setMessageLimit(sendData.remainingMessages + sendData.messagesSent)
 
       const prompt = userQuestion
-        ? `Analyze the romantic relationship between ${singleRelationship.personName1} and ${singleRelationship.personName2}. 
-     Given the context below, provide a research-backed response in 50-70 words to address the following question: 
-     "${userQuestion}"  
+        ? `Analyze the romantic relationship between ${relationship.personName1} and ${relationship.personName2}. 
+   Given the context below, provide a research-backed response in 50-70 words to address the following question: 
+   "${userQuestion}"  
 
-     Relationship details:  
-     - ${singleRelationship.personName1}: ${singleRelationship.attachmentStyle1} attachment, ${singleRelationship.loveLanguage1} love language, ${singleRelationship.communicationStyle1} communication style, ${singleRelationship.conflictStyle1} conflict style  
-     - ${singleRelationship.personName2}: ${singleRelationship.attachmentStyle2} attachment, ${singleRelationship.loveLanguage2} love language, ${singleRelationship.communicationStyle2} communication style, ${singleRelationship.conflictStyle2} conflict style  
-     - Relationship stage: ${singleRelationship.relationshipState}  
-     - Length of relationship: ${singleRelationship.relationshipLength}  
-     - Living situation: ${singleRelationship.livingStatus}  
+   Relationship details:  
+   - ${relationship.personName1}: ${relationship.attachmentStyle1} attachment, ${relationship.loveLanguage1} love language, ${relationship.communicationStyle1} communication style, ${relationship.conflictStyle1} conflict style  
+   - ${relationship.personName2}: ${relationship.attachmentStyle2} attachment, ${relationship.loveLanguage2} love language, ${relationship.communicationStyle2} communication style, ${relationship.conflictStyle2} conflict style  
+   - Relationship stage: ${relationship.relationshipState}  
+   - Length of relationship: ${relationship.relationshipLength}  
+   - Living situation: ${relationship.livingStatus}  
 
-     Ensure the response is strictly based on psychological and relationship research without opinions or fabrications.`
-        : `Provide a concise, research-backed 100-150 word analysis of the romantic relationship between ${singleRelationship.personName1} and ${singleRelationship.personName2}, considering their unique profiles:  
+   Ensure the response is strictly based on psychological and relationship research without opinions or fabrications.`
+        : `Provide a concise, research-backed 100-150 word analysis of the romantic relationship between ${relationship.personName1} and ${relationship.personName2}, considering their unique profiles:  
 
-     - ${singleRelationship.personName1}: ${singleRelationship.attachmentStyle1} attachment, ${singleRelationship.loveLanguage1} love language, ${singleRelationship.communicationStyle1} communication style, ${singleRelationship.conflictStyle1} conflict style  
-     - ${singleRelationship.personName2}: ${singleRelationship.attachmentStyle2} attachment, ${singleRelationship.loveLanguage2} love language, ${singleRelationship.communicationStyle2} communication style, ${singleRelationship.conflictStyle2} conflict style  
-     - Relationship stage: ${singleRelationship.relationshipState}  
-     - Length of relationship: ${singleRelationship.relationshipLength}  
-     - Living situation: ${singleRelationship.livingStatus}  
+   - ${relationship.personName1}: ${relationship.attachmentStyle1} attachment, ${relationship.loveLanguage1} love language, ${relationship.communicationStyle1} communication style, ${relationship.conflictStyle1} conflict style  
+   - ${relationship.personName2}: ${relationship.attachmentStyle2} attachment, ${relationship.loveLanguage2} love language, ${relationship.communicationStyle2} communication style, ${relationship.conflictStyle2} conflict style  
+   - Relationship stage: ${relationship.relationshipState}  
+   - Length of relationship: ${relationship.relationshipLength}  
+   - Living situation: ${relationship.livingStatus}  
 
-     The response must be rooted in scientific research on relationships, attachment theory, communication, and conflict resolution.`
+   The response must be rooted in scientific research on relationships, attachment theory, communication, and conflict resolution.`
 
       const openAIResponse = await fetch(
         'https://api.openai.com/v1/chat/completions',
@@ -174,76 +276,118 @@ const Message = () => {
       const aiMessage =
         data.choices[0]?.message?.content || "I couldn't generate a response."
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: Date.now(),
-          text: aiMessage,
-          isAi: true,
-          timestamp: new Date().toLocaleTimeString(),
-        },
-      ])
+      // Create AI message object
+      const aiMessageObj = {
+        text: aiMessage,
+        isAi: true,
+        timestamp: Date.now(),
+        displayTime: new Date().toLocaleTimeString(),
+      }
+
+      // Save AI message to Firebase
+      const messagesRef = ref(
+        db,
+        `users/${user.uid}/conversations/${convId}/messages`
+      )
+      await push(messagesRef, aiMessageObj)
     } catch (error) {
       console.error('Error:', error)
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: Date.now(),
-          text: "Sorry, I couldn't process your request.",
-          isAi: true,
-          timestamp: new Date().toLocaleTimeString(),
-        },
-      ])
+
+      // Save error message to Firebase
+      if (currentConversationId) {
+        const user = JSON.parse(localStorage.getItem('user'))
+        if (user?.uid) {
+          const errorMessage = {
+            text: "Sorry, I couldn't process your request.",
+            isAi: true,
+            timestamp: Date.now(),
+            displayTime: new Date().toLocaleTimeString(),
+          }
+
+          const messagesRef = ref(
+            db,
+            `users/${user.uid}/conversations/${currentConversationId}/messages`
+          )
+          await push(messagesRef, errorMessage)
+        }
+      }
     } finally {
       setIsAiTyping(false)
     }
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!inputMessage.trim() || limitReached) return
+  const createNewConversation = async () => {
+    const user = JSON.parse(localStorage.getItem('user'))
+    if (!user?.uid || !id) return null
 
-    // Add user message
-    const newMessage = {
-      id: Date.now(),
-      text: inputMessage,
-      isAi: false,
-      timestamp: new Date().toLocaleTimeString(),
+    // Create a new conversation in Firebase
+    const newConversation = {
+      relationshipId: id,
+      title: relationship?.relationshipTitle || 'New Conversation',
+      createdAt: Date.now(),
     }
 
-    setMessages((prev) => [...prev, newMessage])
-    setInputMessage('')
+    const conversationsRef = ref(db, `users/${user.uid}/conversations`)
+    const newConversationRef = push(conversationsRef)
+    await set(newConversationRef, newConversation)
 
-    // Generate AI response
-    await generateAiResponse(inputMessage)
+    const conversationId = newConversationRef.key
+
+    // Set as current conversation
+    setCurrentConversationId(conversationId)
+    setMessages([])
+    setShowHistory(false) // Hide history when creating a new conversation
+
+    // Update URL to include the new conversation ID
+    navigate(`/messages/${id}?conversation=${conversationId}`, {
+      replace: true,
+    })
+
+    // Generate initial AI message if this is a new relationship
+    if (messages.length === 0 && relationship) {
+      setTimeout(() => {
+        generateAiResponse('', conversationId)
+      }, 500)
+    }
+
+    return conversationId
   }
 
-  // Check message limit on component mount
-  useEffect(() => {
-    checkMessageLimit()
-  }, [])
+  const handleSelectConversation = (conversationId) => {
+    setCurrentConversationId(conversationId)
+    loadConversationMessages(conversationId)
+    navigate(`/messages/${id}?conversation=${conversationId}`, {
+      replace: true,
+    })
+    setShowHistory(false) // Hide history after selecting a conversation
+  }
+
+  const handleSuggestedQuestion = (question) => {
+    handleSendMessage(question)
+  }
+
+  const toggleHistory = () => {
+    setShowHistory(!showHistory)
+  }
+
+  if (!relationship) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="animate-pulse">
+          <div className="h-8 w-48 bg-gray-200 rounded mb-4"></div>
+          <div className="h-4 w-32 bg-gray-200 rounded mb-8"></div>
+          <div className="h-64 bg-gray-100 rounded-lg mb-4"></div>
+          <div className="h-12 bg-gray-200 rounded-lg"></div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col space-y-6">
         {/* Header section */}
-        <div className="flex items-start gap-4">
-          <div
-            className="h-8 w-8 rounded-full bg-pink-200 flex justify-center items-center cursor-pointer shrink-0"
-            onClick={() => navigate(-1)}
-          >
-            <ArrowLeft />
-          </div>
-
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold">
-              {singleRelationship?.relationshipTitle}
-            </h1>
-            <button className="p-1 border border-gray-300 rounded-3xl text-xs font-bold mt-1">
-              {singleRelationship?.status}
-            </button>
-          </div>
-        </div>
+        <RelationshipHeader relationship={relationship} />
 
         {/* Message limit indicator */}
         {messageLimit !== null && (
@@ -259,291 +403,443 @@ const Message = () => {
           </div>
         )}
 
-        {/* Main content grid */}
-        <div className="flex flex-col-reverse lg:flex-row gap-8 ">
-          {/* Content - relationship advice section */}
-          <div className="w-full lg:w-2/3">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="text-pink-500">
-                <Heart className="h-6 w-6" />
-              </div>
-              <h1 className="font-semibold">Relationship Advice</h1>
-            </div>
+        {/* Conversation Actions */}
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggleHistory}
+              className={`flex items-center px-3 py-1.5 rounded-lg text-sm ${
+                showHistory
+                  ? 'bg-pink-100 text-pink-700'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              <History className="h-4 w-4 mr-1.5" />
+              {showHistory ? 'Hide History' : 'View History'}
+            </button>
 
-            <p className="text-gray-500 mb-6 font-medium">
-              Ai Provided guidance based on scientific relationship.
-            </p>
-
-            {/* Chat container */}
-            <div className="border border-gray-200 rounded-lg h-[400px] sm:h-[500px] overflow-hidden flex flex-col">
-              {/* Messages area */}
-              <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
-                {limitReached ? (
-                  <div className="flex items-center justify-center h-full text-gray-400">
-                    You've reached your message limit. Please upgrade your plan.
-                  </div>
-                ) : messages.length === 0 && !isAiTyping ? (
-                  <div className="flex items-center justify-center h-full text-gray-400">
-                    Your relationship analysis will appear here
-                  </div>
-                ) : (
-                  messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`mb-4 ${
-                        message.isAi ? '' : 'flex justify-end'
-                      }`}
-                    >
-                      <div
-                        className={`max-w-[90%] sm:max-w-[80%] p-3 rounded-lg ${
-                          message.isAi
-                            ? 'bg-white border border-gray-200'
-                            : 'bg-pink-100 text-pink-900'
-                        }`}
-                      >
-                        <p className="text-sm sm:text-base">{message.text}</p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {message.timestamp} {message.isAi ? '· RelateAI' : ''}
-                        </p>
-                      </div>
-                    </div>
-                  ))
-                )}
-
-                {isAiTyping && (
-                  <div className="mb-4">
-                    <div className="max-w-[80%] p-3 rounded-lg bg-white border border-gray-200">
-                      <div className="flex space-x-2">
-                        <div className="w-2 h-2 rounded-full bg-gray-300 animate-bounce"></div>
-                        <div className="w-2 h-2 rounded-full bg-gray-300 animate-bounce delay-100"></div>
-                        <div className="w-2 h-2 rounded-full bg-gray-300 animate-bounce delay-200"></div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Input area */}
-              <form
-                onSubmit={handleSubmit}
-                className="border-t border-gray-200 p-4 bg-white"
-              >
-                <div className="flex items-center">
-                  <input
-                    type="text"
-                    value={inputMessage}
-                    onChange={(e) => setInputMessage(e.target.value)}
-                    placeholder={
-                      limitReached
-                        ? 'Message limit reached - upgrade plan'
-                        : 'Ask any question about your relationship...'
-                    }
-                    className="flex-1 border border-gray-300 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-300 text-sm sm:text-base"
-                    disabled={isAiTyping || limitReached}
-                  />
-                  <button
-                    type="submit"
-                    className="bg-pink-500 text-white px-4 py-2 rounded-r-lg hover:bg-pink-600 transition-colors disabled:opacity-50"
-                    disabled={
-                      !inputMessage.trim() || isAiTyping || limitReached
-                    }
-                  >
-                    <Send className="h-5 w-5" />
-                  </button>
-                </div>
-                <p className="text-xs text-gray-500 mt-2">
-                  RelateAI provides research-based relationship insights
-                </p>
-              </form>
-            </div>
-
-            {/* Suggested questions */}
-            {!limitReached && (
-              <div className="mt-4">
-                <h3 className="text-sm font-medium text-gray-500 mb-2">
-                  Try asking:
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    'How can we improve our communication?',
-                    'What are our relationship strengths?',
-                    'How to handle conflicts better?',
-                    'Tips for our attachment styles',
-                  ].map((question) => (
-                    <button
-                      key={question}
-                      onClick={() => setInputMessage(question)}
-                      className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-full transition-colors"
-                    >
-                      {question}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+            <button
+              onClick={createNewConversation}
+              className="flex items-center px-3 py-1.5 bg-pink-500 text-white rounded-lg hover:bg-pink-600 text-sm"
+            >
+              <Plus className="h-4 w-4 mr-1.5" />
+              New Conversation
+            </button>
           </div>
 
-          {/* Sidebar */}
-          <div className="w-full lg:w-1/3">
-            <div className="flex items-center gap-2">
-              <div className="text-pink-500">
-                <CircleAlert />
-              </div>
-              <h1 className="font-semibold">Relationship Details</h1>
-            </div>
-
-            <h1 className="text-gray-500 my-3 font-medium">
-              Key information about your relationship
-            </h1>
-
-            <div className="flex gap-2 mt-6">
-              <div className="text-gray-500 shrink-0">
-                <Clock />
-              </div>
-              <div>
-                <h1 className="font-medium">Length</h1>
-                <p className="text-gray-500">
-                  {singleRelationship?.relationshipLength}
-                </p>
+          {!showHistory && conversations.length > 0 && (
+            <div className="flex items-center">
+              <span className="text-sm text-gray-500 mr-2">Current:</span>
+              <div className="flex items-center bg-gray-100 px-3 py-1.5 rounded-lg">
+                <MessageCircle className="h-4 w-4 text-pink-500 mr-1.5" />
+                <span className="text-sm font-medium">
+                  {conversations.find((c) => c.id === currentConversationId)
+                    ?.title || 'Conversation'}
+                </span>
               </div>
             </div>
-
-            <div className="flex gap-2 mt-3 border-b border-gray-300 pb-3">
-              <div className="text-gray-500 shrink-0">
-                <House />
-              </div>
-              <div>
-                <h1 className="font-medium">Living Status</h1>
-                <p className="text-gray-500">
-                  {singleRelationship?.livingStatus}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center mb-3 mt-3">
-              <User className="h-5 w-5 text-gray-500 mr-2" />
-              <h2 className="text-sm font-bold text-gray-700">
-                Personality Profiles
-              </h2>
-            </div>
-
-            {/* Person 1 Profile */}
-            <div className="border-b border-gray-300 pb-3">
-              <div className="flex items-center mb-6">
-                <div className="flex items-center justify-center h-8 w-8 rounded-full bg-pink-100 text-pink-500 mr-3">
-                  <span className="text-sm font-medium">P</span>
-                </div>
-                <span className="text-sm font-medium">Person 1</span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">
-                    Love Language
-                  </div>
-                  <div className="flex items-center">
-                    <Gift className="h-4 w-4 text-gray-700 mr-2 shrink-0" />
-                    <span className="text-sm font-medium text-gray-900">
-                      {singleRelationship?.loveLanguage1}
-                    </span>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">
-                    Communication
-                  </div>
-                  <div className="flex items-center">
-                    <MessageCircle className="h-4 w-4 text-gray-700 mr-2 shrink-0" />
-                    <span className="text-sm font-medium text-gray-900">
-                      {singleRelationship?.communicationStyle1}
-                    </span>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">
-                    Conflict Style
-                  </div>
-                  <div className="flex items-center">
-                    <Heart className="h-4 w-4 text-gray-700 mr-2 shrink-0" />
-                    <span className="text-sm font-medium text-gray-900">
-                      {singleRelationship?.conflictStyle1}
-                    </span>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">Attachment</div>
-                  <div className="flex items-center">
-                    <Shield className="h-4 w-4 text-gray-700 mr-2 shrink-0" />
-                    <span className="text-sm font-medium text-gray-900">
-                      {singleRelationship?.attachmentStyle1}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Person 2 Profile */}
-            <div className="pt-3">
-              <div className="flex items-center mb-6">
-                <div className="flex items-center justify-center h-8 w-8 rounded-full bg-pink-100 text-pink-500 mr-3">
-                  <span className="text-sm font-medium">P</span>
-                </div>
-                <span className="text-sm font-medium">Person 2</span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">
-                    Love Language
-                  </div>
-                  <div className="flex items-center">
-                    <Gift className="h-4 w-4 text-gray-700 mr-2 shrink-0" />
-                    <span className="text-sm font-medium text-gray-900">
-                      {singleRelationship?.loveLanguage2}
-                    </span>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">
-                    Communication
-                  </div>
-                  <div className="flex items-center">
-                    <MessageCircle className="h-4 w-4 text-gray-700 mr-2 shrink-0" />
-                    <span className="text-sm font-medium text-gray-900">
-                      {singleRelationship?.communicationStyle2}
-                    </span>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">
-                    Conflict Style
-                  </div>
-                  <div className="flex items-center">
-                    <Heart className="h-4 w-4 text-gray-700 mr-2 shrink-0" />
-                    <span className="text-sm font-medium text-gray-900">
-                      {singleRelationship?.conflictStyle2}
-                    </span>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">Attachment</div>
-                  <div className="flex items-center">
-                    <Shield className="h-4 w-4 text-gray-700 mr-2 shrink-0" />
-                    <span className="text-sm font-medium text-gray-900">
-                      {singleRelationship?.attachmentStyle2}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
+
+        {/* Main content */}
+        {showHistory ? (
+          <ConversationHistory
+            conversations={conversations}
+            currentConversationId={currentConversationId}
+            relationshipId={id}
+            onSelectConversation={handleSelectConversation}
+            onNewConversation={createNewConversation}
+          />
+        ) : (
+          <div className="flex flex-col-reverse lg:flex-row gap-8">
+            {/* Content - relationship advice section */}
+            <div className="w-full lg:w-2/3">
+              {/* Chat container */}
+              <div className="border border-gray-200 rounded-lg h-[400px] sm:h-[500px] overflow-hidden flex flex-col">
+                {/* Messages area */}
+                <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
+                  {limitReached ? (
+                    <div className="flex items-center justify-center h-full text-gray-400">
+                      You've reached your message limit. Please upgrade your
+                      plan.
+                    </div>
+                  ) : messages.length === 0 && !isAiTyping ? (
+                    <div className="flex items-center justify-center h-full text-gray-400">
+                      Your relationship analysis will appear here
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {messages.map((message) => (
+                        <MessageBubble
+                          key={message.id}
+                          message={message}
+                          isOwnMessage={!message.isAi}
+                        />
+                      ))}
+
+                      {isAiTyping && (
+                        <div className="mb-4">
+                          <div className="max-w-[80%] p-3 rounded-lg bg-white border border-gray-200">
+                            <div className="flex space-x-2">
+                              <div className="w-2 h-2 rounded-full bg-gray-300 animate-bounce"></div>
+                              <div className="w-2 h-2 rounded-full bg-gray-300 animate-bounce delay-100"></div>
+                              <div className="w-2 h-2 rounded-full bg-gray-300 animate-bounce delay-200"></div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Input area */}
+                <MessageInput
+                  onSendMessage={handleSendMessage}
+                  disabled={isAiTyping || limitReached}
+                />
+              </div>
+
+              {/* Suggested questions */}
+              <SuggestedQuestions
+                onSelectQuestion={handleSuggestedQuestion}
+                disabled={isAiTyping || limitReached}
+              />
+            </div>
+
+            {/* Sidebar - Relationship Details */}
+            <div className="w-full lg:w-1/3">
+              <div className="flex items-center gap-2">
+                <div className="text-pink-500">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-circle-alert"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" x2="12" y1="8" y2="12" />
+                    <line x1="12" x2="12.01" y1="16" y2="16" />
+                  </svg>
+                </div>
+                <h1 className="font-semibold">Relationship Details</h1>
+              </div>
+
+              <h1 className="text-gray-500 my-3 font-medium">
+                Key information about your relationship
+              </h1>
+
+              <div className="flex gap-2 mt-6">
+                <div className="text-gray-500 shrink-0">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-clock"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                </div>
+                <div>
+                  <h1 className="font-medium">Length</h1>
+                  <p className="text-gray-500">
+                    {relationship?.relationshipLength}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-2 mt-3 border-b border-gray-300 pb-3">
+                <div className="text-gray-500 shrink-0">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-house"
+                  >
+                    <path d="M20 9v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9" />
+                    <path d="M9 22V12h6v10" />
+                    <path d="M2 10.6 12 2l10 8.6" />
+                  </svg>
+                </div>
+                <div>
+                  <h1 className="font-medium">Living Status</h1>
+                  <p className="text-gray-500">{relationship?.livingStatus}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center mb-3 mt-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="lucide lucide-user h-5 w-5 text-gray-500 mr-2"
+                >
+                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+                <h2 className="text-sm font-bold text-gray-700">
+                  Personality Profiles
+                </h2>
+              </div>
+
+              {/* Person 1 Profile */}
+              <div className="border-b border-gray-300 pb-3">
+                <div className="flex items-center mb-6">
+                  <div className="flex items-center justify-center h-8 w-8 rounded-full bg-pink-100 text-pink-500 mr-3">
+                    <span className="text-sm font-medium">P</span>
+                  </div>
+                  <span className="text-sm font-medium">
+                    {relationship?.personName1}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+                  <div>
+                    <div className="text-xs text-gray-500 mb-1">
+                      Love Language
+                    </div>
+                    <div className="flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="lucide lucide-gift h-4 w-4 text-gray-700 mr-2 shrink-0"
+                      >
+                        <polyline points="20 12 20 22 4 22 4 12" />
+                        <rect width="20" height="5" x="2" y="7" />
+                        <line x1="12" x2="12" y1="22" y2="7" />
+                        <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+                        <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+                      </svg>
+                      <span className="text-sm font-medium text-gray-900">
+                        {relationship?.loveLanguage1}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-xs text-gray-500 mb-1">
+                      Communication
+                    </div>
+                    <div className="flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="lucide lucide-message-circle h-4 w-4 text-gray-700 mr-2 shrink-0"
+                      >
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                      </svg>
+                      <span className="text-sm font-medium text-gray-900">
+                        {relationship?.communicationStyle1}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-xs text-gray-500 mb-1">
+                      Conflict Style
+                    </div>
+                    <div className="flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="lucide lucide-heart h-4 w-4 text-gray-700 mr-2 shrink-0"
+                      >
+                        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                      </svg>
+                      <span className="text-sm font-medium text-gray-900">
+                        {relationship?.conflictStyle1}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-xs text-gray-500 mb-1">Attachment</div>
+                    <div className="flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="lucide lucide-shield h-4 w-4 text-gray-700 mr-2 shrink-0"
+                      >
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+                      </svg>
+                      <span className="text-sm font-medium text-gray-900">
+                        {relationship?.attachmentStyle1}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Person 2 Profile */}
+              <div className="pt-3">
+                <div className="flex items-center mb-6">
+                  <div className="flex items-center justify-center h-8 w-8 rounded-full bg-pink-100 text-pink-500 mr-3">
+                    <span className="text-sm font-medium">P</span>
+                  </div>
+                  <span className="text-sm font-medium">
+                    {relationship?.personName2}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+                  <div>
+                    <div className="text-xs text-gray-500 mb-1">
+                      Love Language
+                    </div>
+                    <div className="flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="lucide lucide-gift h-4 w-4 text-gray-700 mr-2 shrink-0"
+                      >
+                        <polyline points="20 12 20 22 4 22 4 12" />
+                        <rect width="20" height="5" x="2" y="7" />
+                        <line x1="12" x2="12" y1="22" y2="7" />
+                        <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+                        <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+                      </svg>
+                      <span className="text-sm font-medium text-gray-900">
+                        {relationship?.loveLanguage2}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-xs text-gray-500 mb-1">
+                      Communication
+                    </div>
+                    <div className="flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="lucide lucide-message-circle h-4 w-4 text-gray-700 mr-2 shrink-0"
+                      >
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                      </svg>
+                      <span className="text-sm font-medium text-gray-900">
+                        {relationship?.communicationStyle2}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-xs text-gray-500 mb-1">
+                      Conflict Style
+                    </div>
+                    <div className="flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="lucide lucide-heart h-4 w-4 text-gray-700 mr-2 shrink-0"
+                      >
+                        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                      </svg>
+                      <span className="text-sm font-medium text-gray-900">
+                        {relationship?.conflictStyle2}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-xs text-gray-500 mb-1">Attachment</div>
+                    <div className="flex items-center">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="lucide lucide-shield h-4 w-4 text-gray-700 mr-2 shrink-0"
+                      >
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
+                      </svg>
+                      <span className="text-sm font-medium text-gray-900">
+                        {relationship?.attachmentStyle2 || ''}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

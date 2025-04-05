@@ -14,13 +14,14 @@ import PrivateRoute from './PrivateRoute'
 import PublicRoute from './PublicRoute'
 import Success from '../pages/Success'
 import Cancel from '../pages/Cancel' // Import Cancel Page
-import MessagePage from '../pages/MessagePage'
+import MessagePage from '../pages/Message'
 import VerifyEmail from '../pages/Authentication/VerifyEmail';
 import VerifyEmailbytoken from '../pages/Authentication/VerifyEmailbytoken'
 import RelationshipDetail from '../pages/RelationshipDetail'
 import Message from '../pages/Message'
 import ForgetPass from '../pages/Authentication/ForgotPass'
 import ResetPassword from '../pages/Authentication/ResetPassword'
+import Conversations from '../pages/conversations'
 
 const router = createBrowserRouter([
   {
@@ -74,6 +75,10 @@ const router = createBrowserRouter([
             <RelationshipDetail />,
           </PrivateRoute>
         ),
+      },
+      {
+        path: '/conversations/:id',
+        element: <Conversations/>
       },
       {
         path: '/verify-email',
