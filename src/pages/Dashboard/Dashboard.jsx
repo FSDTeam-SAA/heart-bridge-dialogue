@@ -19,8 +19,8 @@ const DashboardLayout = () => {
   const location = useLocation()
   const [user, setUser] = useState(null)
   const [messageData, setMessageData] = useState({
-    messagesSent: 0,
-    messageLimit: 0,
+    messagesSent: 10,
+    messageLimit: 10,
     planStatus: 'inactive',
   })
   const [relationships, setRelationships] = useState([])
