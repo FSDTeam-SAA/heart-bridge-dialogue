@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { ref, onValue, push, set } from 'firebase/database'
@@ -230,76 +231,84 @@ const Message = () => {
       setMessagesSent(sendData.messagesSent)
       setMessageLimit(sendData.remainingMessages + sendData.messagesSent)
 
-     
-const prompt = userQuestion
-  ? `**Role**: You are an expert relationship psychologist specializing in attachment theory, communication patterns, and conflict resolution. Your responses must be:
-  - Based ONLY on peer-reviewed scientific research
-  - Formatted in clear markdown
-  - Structured for easy reading
-  - Focused on actionable advice
+      // Updated prompt with markdown formatting
+      const prompt = userQuestion
+        ? `You are an expert in romantic relationships, attachment styles, communication, psychology and everything around this topic. You only quote scientific backed research, you do not have any opinions, and you do not fabricate any of your responses.
 
-**Relationship Context**:
-- Couple: ${relationship.personName1} & ${relationship.personName2}
-- Relationship Stage: ${relationship.relationshipState}
-- Duration: ${relationship.relationshipLength}
-- Living Situation: ${relationship.livingStatus}
+Today, we are going to help ${relationship.personName1} and ${relationship.personName2}. This is what you need to know:
 
-**Key Profiles**:
-|||
-|---|---|
-| **Person 1** | **Person 2** |
-| Love Language: ${relationship.loveLanguage1} | Love Language: ${relationship.loveLanguage2} |
-| Communication: ${relationship.communicationStyle1} | Communication: ${relationship.communicationStyle2} |
-| Conflict Style: ${relationship.conflictStyle1} | Conflict Style: ${relationship.conflictStyle2} |
-| Attachment: ${relationship.attachmentStyle1} | Attachment: ${relationship.attachmentStyle2} |
+Relationship Title: ${relationship.relationshipTitle}
 
-**Perspectives**:
-- ${relationship.personName1}: "${relationship.person1Perspective}"
-- ${relationship.personName2}: "${relationship.person2Perspective}"
+Length of relationship: ${relationship.relationshipLength}
 
-**Response Requirements**:
-1. Format using markdown (## headings, **bold** key terms, bullet points)
-2. Start with 1-2 sentence summary
-3. Include 3-5 research-backed recommendations
-4. End with open-ended questions to deepen understanding
-5. Cite studies using [Author, Year] format
+Living status: ${relationship.livingStatus}
 
-**Current Query**: "${userQuestion}"
-`
-  : `**Initial Analysis Request**:
+Relationship stage: ${relationship.relationshipState}
 
-  ## Relationship Assessment Needed
-  
-  Based on the provided profile for ${relationship.personName1} and ${relationship.personName2}, please:
-  
-  1. **Identify 3 key areas** of potential growth/conflict
-  2. **Ask 5-7 diagnostic questions** to better understand:
-     - Their conflict resolution patterns
-     - Emotional connection quality
-     - Daily interaction dynamics
-  3. Format your response with:
-     - Clear section headers (##)
-     - Bullet points for lists
-     - Bolded key terms
-     - Research citations where applicable
-  
-  Example structure:
-  \`\`\`markdown
-  ## Initial Observations
-  
-  - **Key dynamic**: [description] 
-  - **Primary strength**: [description]
-  
-  ## Recommended Exploration
-  
-  1. Question 1?
-  2. Question 2?
-  
-  ## Supporting Research
-  
-  - [Johnson, 2008] found that...
-  \`\`\`
-  `
+Person 1 perspective: ${relationship.yourFellings1}
+
+Person 2 perspective: ${relationship.yourFellings2}
+
+Person 1 Love Language: ${relationship.loveLanguage1}
+
+Person 2 Love Language: ${relationship.loveLanguage2}
+
+Person 1 Communication Style: ${relationship.communicationStyle1}
+
+Person 2 Communication Style: ${relationship.communicationStyle2}
+
+Person 1 Conflict Style: ${relationship.conflictStyle1}
+
+Person 2 Conflict Style: ${relationship.conflictStyle2}
+
+Person 1 Attachment Style: ${relationship.attachmentStyle1}
+
+Person 2 Attachment Style: ${relationship.attachmentStyle2}
+
+Remember, using all of the above information, your job is to quote scientific backed research to give ${relationship.personName1} and ${relationship.personName2} the best chance of flourishing in a romantic relationship.
+
+But before you do this – ask as many questions as you need to, to fully understand all of the context within their romantic relationship.
+
+Please continue with all of the questions you need to generate your scientific, research backed response.
+
+"${userQuestion}"`
+        : `You are an expert in romantic relationships, attachment styles, communication, psychology and everything around this topic. You only quote scientific backed research, you do not have any opinions, and you do not fabricate any of your responses.
+
+Today, we are going to help ${relationship.personName1} and ${relationship.personName2}. This is what you need to know:
+
+Relationship Title: ${relationship.relationshipTitle}
+
+Length of relationship: ${relationship.relationshipLength}
+
+Living status: ${relationship.livingStatus}
+
+Relationship stage: ${relationship.relationshipState}
+
+Person 1 perspective: ${relationship.yourFellings1}
+
+Person 2 perspective: ${relationship.yourFellings2}
+
+Person 1 Love Language: ${relationship.loveLanguage1}
+
+Person 2 Love Language: ${relationship.loveLanguage2}
+
+Person 1 Communication Style: ${relationship.communicationStyle1}
+
+Person 2 Communication Style: ${relationship.communicationStyle2}
+
+Person 1 Conflict Style: ${relationship.conflictStyle1}
+
+Person 2 Conflict Style: ${relationship.conflictStyle2}
+
+Person 1 Attachment Style: ${relationship.attachmentStyle1}
+
+Person 2 Attachment Style: ${relationship.attachmentStyle2}
+
+Remember, using all of the above information, your job is to quote scientific backed research to give ${relationship.personName1} and ${relationship.personName2} the best chance of flourishing in a romantic relationship.
+
+But before you do this – ask as many questions as you need to, to fully understand all of the context within their romantic relationship.
+
+Please continue with all of the questions you need to generate your scientific, research backed response.`
 
       const openAIResponse = await fetch(
         'https://api.openai.com/v1/chat/completions',
@@ -313,7 +322,7 @@ const prompt = userQuestion
             model: 'gpt-3.5-turbo',
             messages: [{ role: 'user', content: prompt }],
             temperature: 0.7,
-            max_tokens: 1000,
+            max_tokens: 500, // Increased token limit for more detailed responses
           }),
         }
       )
@@ -883,6 +892,115 @@ const prompt = userQuestion
                   </div>
                 </div>
               </div>
+
+              {/* Perspectives Section */}
+              <div className="mt-6 pt-3 border-t border-gray-300">
+                <div className="flex items-center mb-3">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-clipboard-check h-5 w-5 text-pink-500 mr-2"
+                  >
+                    <rect width="8" height="4" x="8" y="2" rx="1" ry="1" />
+                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                    <path d="m9 14 2 2 4-4" />
+                  </svg>
+
+                  <h2 className="text-sm font-bold text-gray-700">
+                    Perspectives
+                  </h2>
+                </div>
+                <p className="text-xs text-gray-500 mb-4">
+                  How you both view your relationship
+                </p>
+
+                {/* Tabs */}
+                <div className="grid grid-cols-2 mb-4">
+                  <div className="text-center py-2 bg-gray-100 rounded-l-lg border border-r-0 border-gray-200 flex items-center justify-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="lucide lucide-user h-4 w-4 mr-2"
+                    >
+                      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    <span className="text-sm">{relationship?.personName1}</span>
+                  </div>
+                  <div className="text-center py-2 bg-white rounded-r-lg border border-gray-200 flex items-center justify-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="lucide lucide-user h-4 w-4 mr-2"
+                    >
+                      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    <span className="text-sm">{relationship?.personName2}</span>
+                  </div>
+                </div>
+
+                {/* Person 1's Perspective */}
+                <div className="mb-4">
+                  <div className="flex items-center mb-2">
+                    <div className="flex items-center justify-center h-6 w-6 rounded-full bg-pink-100 text-pink-500 mr-2">
+                      <span className="text-xs font-medium">
+                        {relationship?.personName1?.charAt(0) || 'P'}
+                      </span>
+                    </div>
+                    <span className="text-sm font-medium">
+                      {relationship?.personName1}'s Perspective
+                    </span>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <p className="text-sm text-gray-700">
+                      {relationship?.yourFellings1 ||
+                        'No perspective shared yet.'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Person 2's Perspective */}
+                <div>
+                  <div className="flex items-center mb-2">
+                    <div className="flex items-center justify-center h-6 w-6 rounded-full bg-pink-100 text-pink-500 mr-2">
+                      <span className="text-xs font-medium">
+                        {relationship?.personName2?.charAt(0) || 'P'}
+                      </span>
+                    </div>
+                    <span className="text-sm font-medium">
+                      {relationship?.personName2}'s Perspective
+                    </span>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <p className="text-sm text-gray-700">
+                      {relationship?.yourFellings2 ||
+                        'No perspective shared yet.'}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -892,4 +1010,3 @@ const prompt = userQuestion
 }
 
 export default Message
-
