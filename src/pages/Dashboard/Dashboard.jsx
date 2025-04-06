@@ -95,10 +95,7 @@ const DashboardLayout = () => {
 
    console.log('From no relationship from dashboard', relationships)
 
-  // const usagePercentage =
-  //   messageData.messageLimit > 0
-  //     ? (messageData.messagesSent / messageData.messageLimit) * 100
-  //     : 0
+  
    const usagePercentage = Math.min(
      (messageData.messagesSent / messageData.messageLimit) * 100,
      100
@@ -141,13 +138,7 @@ const DashboardLayout = () => {
                   <Plus className="mr-2 h-4 w-4" />
                   <span>New Relationship</span>
                 </Link>
-                {/* <Link
-                  to="/messages"
-                  className="w-full flex items-center text-sm font-medium text-pink-600 hover:bg-pink-50 px-2 py-1.5 rounded-md"
-                >
-                  <MessageCircle className="mr-2 h-4 w-4" />
-                  <span>Messages</span>
-                </Link> */}
+                
               </div>
             </div>
 
