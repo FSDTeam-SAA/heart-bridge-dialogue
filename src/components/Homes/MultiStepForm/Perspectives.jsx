@@ -39,7 +39,7 @@ const Perspectives = ({ handleNextStep, handlePreviousStep }) => {
               <input
                 type="text"
                 {...register("personName1", { required: true })}
-                placeholder="E.g., Relationshop whit partner"
+                placeholder=""
                 className="w-full border border-gray py-2 px-2 rounded-lg mt-2"
               />
               {errors?.personName1 && (
@@ -63,7 +63,7 @@ const Perspectives = ({ handleNextStep, handlePreviousStep }) => {
               <textarea
                 type="text"
                 {...register("yourFellings1", { required: true })}
-                placeholder="E.g., Relationshop whit partner"
+                placeholder=""
                 className="w-full border border-gray pt-2 pb-14 px-2 rounded-lg mt-2"
               />
               {errors?.yourFellings1 && (
@@ -96,7 +96,7 @@ const Perspectives = ({ handleNextStep, handlePreviousStep }) => {
               <input
                 type="text"
                 {...register("personName2", { required: true })}
-                placeholder="E.g., Relationshop whit partner"
+                placeholder=""
                 className="w-full border border-gray py-2 px-2 rounded-lg mt-2"
               />
               {errors?.personName2 && (
@@ -120,7 +120,7 @@ const Perspectives = ({ handleNextStep, handlePreviousStep }) => {
               <textarea
                 type="text"
                 {...register("yourFellings2", { required: true })}
-                placeholder="E.g., Relationshop whit partner"
+                placeholder=""
                 className="w-full border border-gray pt-2 pb-14 px-2 rounded-lg mt-2"
               />
               {errors?.yourFellings2 && (
