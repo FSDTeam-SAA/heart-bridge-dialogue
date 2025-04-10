@@ -70,7 +70,7 @@ const Sidebar = () => {
           className="flex items-center justify-center text-pink-500 font-bold text-xl"
         >
           <Heart className="mr-2 h-5 w-5" />
-          <span>My Relationship Ai</span>
+          <span>My Relationship AI</span>
         </Link>
       </div>
 

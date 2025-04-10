@@ -90,7 +90,7 @@ const NoRelationship = () => {
     return (
       <div className="flex flex-col items-center justify-center h-full px-4 text-center">
         <h1 className="text-4xl font-bold text-[#C62553] mb-4">
-          My Relationship Ai
+          My Relationship AI
         </h1>
         <p className="text-gray-500 mb-8 text-xl">
           What relationship would you like to discuss?

@@ -103,7 +103,6 @@ export default function SignUp() {
     })
   }
 
-
   // const handleSignUp = async (e) => {
   //   e.preventDefault()
   //   if (!validateForm()) return
@@ -117,7 +116,7 @@ export default function SignUp() {
   //       auth,
   //       registerData.email,
   //       registerData.password,
-        
+
   //     )
 
   //     await updateProfile(auth.currentUser, {
@@ -205,7 +204,7 @@ export default function SignUp() {
       setLoading(false)
     }
   }
-    
+
   return (
     <div className="flex min-h-[calc(100vh-66px)] items-center justify-center">
       <div className="w-full max-w-md bg-white p-6 rounded-2xl shadow-md">
@@ -293,7 +292,7 @@ export default function SignUp() {
           <div className=" w-full">
             <ReCAPTCHA
               ref={recaptchaRef}
-              sitekey="6LfcZQMrAAAAAB02s3fmK-6YBS349kLCGmmC4eIg"
+              sitekey="6LchZxArAAAAANZTztFG4lkBOQzcP8LKyMv97UyT"
               onChange={handleCaptchaChange}
               onExpired={handleCaptchaExpired}
               onErrored={handleCaptchaError}

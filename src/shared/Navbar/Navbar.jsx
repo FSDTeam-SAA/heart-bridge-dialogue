@@ -104,7 +104,7 @@ export default function Navbar() {
             className="flex items-center gap-2 text-xl font-bold text-[#C62553]"
           >
             <Heart className="h-5 w-5" />
-            <span>My Relationship Ai</span>
+            <span>My Relationship AI</span>
           </Link>
 
           {/* Desktop navigation */}
@@ -215,7 +215,7 @@ export default function Navbar() {
             className="flex items-center gap-2 text-xl font-semibold text-[#C62553]"
           >
             <Heart className="h-5 w-5 fill-[#C62553]" />
-            <span>My Relationship Ai</span>
+            <span>My Relationship AI</span>
           </Link>
           <button
             onClick={toggleMenu}
