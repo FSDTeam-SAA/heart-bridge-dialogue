@@ -95,6 +95,7 @@ export default function Navbar() {
   )
   const isSignupPage = location.pathname === '/signup'
   const isVerifyEmailPage = location.pathname === '/verify-email'
+  const isLoginPage = location.pathname === '/login'
 
   return (
     <>
@@ -111,7 +112,7 @@ export default function Navbar() {
 
           {/* Desktop navigation */}
           <div className="hidden items-center gap-7 md:flex">
-            {user && !isSignupPage && !isVerifyEmailPage ? (
+            {user && !isSignupPage && !isVerifyEmailPage && !isLoginPage ? (
               <>
                 {userPlan?.planStatus !== 'activate' && (
                   <Link
@@ -244,7 +245,7 @@ export default function Navbar() {
 
         <div className="flex flex-col h-[calc(100%-64px)] justify-between">
           <div className="p-4 space-y-4">
-            {user && !isSignupPage && !isVerifyEmailPage ? (
+            {user && !isSignupPage && !isVerifyEmailPage && !isLoginPage ? (
               <>
                 <Link to="/account">
                   <div className="px-4 pb-2 mb-1 border-b hover:bg-[#C6255310] hover:text-[#C62553] rounded-lg">
