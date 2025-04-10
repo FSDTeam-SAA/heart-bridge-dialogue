@@ -90,8 +90,11 @@ export default function Navbar() {
   }
 
   // Check if current path is auth-related
-  const isAuthPage = ['/login', '/signup'].includes(location.pathname)
+  const isAuthPage = ['/login', '/signup', '/verify-email'].includes(
+    location.pathname
+  )
   const isSignupPage = location.pathname === '/signup'
+  const isVerifyEmailPage = location.pathname === '/verify-email'
 
   return (
     <>
@@ -108,7 +111,7 @@ export default function Navbar() {
 
           {/* Desktop navigation */}
           <div className="hidden items-center gap-7 md:flex">
-            {user && !isSignupPage ? (
+            {user && !isSignupPage && !isVerifyEmailPage ? (
               <>
                 {userPlan?.planStatus !== 'activate' && (
                   <Link
@@ -241,7 +244,7 @@ export default function Navbar() {
 
         <div className="flex flex-col h-[calc(100%-64px)] justify-between">
           <div className="p-4 space-y-4">
-            {user && !isSignupPage ? (
+            {user && !isSignupPage && !isVerifyEmailPage ? (
               <>
                 <Link to="/account">
                   <div className="px-4 pb-2 mb-1 border-b hover:bg-[#C6255310] hover:text-[#C62553] rounded-lg">
@@ -283,7 +286,7 @@ export default function Navbar() {
                 <LogOut className="h-5 w-5 text-[#C62553]" />
                 <span>Log out</span>
               </button>
-            ) : !isSignupPage ? (
+            ) : !isAuthPage ? (
               <>
                 <Link
                   to="/login"
