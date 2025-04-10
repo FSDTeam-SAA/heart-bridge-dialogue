@@ -293,6 +293,7 @@ export default function SignUp() {
             <ReCAPTCHA
               ref={recaptchaRef}
               sitekey="6LchZxArAAAAANZTztFG4lkBOQzcP8LKyMv97UyT"
+              // sitekey="6LfAGRIrAAAAABsC4Aq1nvRnVlFxB8aCRq-RM06_" for localhost 
               onChange={handleCaptchaChange}
               onExpired={handleCaptchaExpired}
               onErrored={handleCaptchaError}
