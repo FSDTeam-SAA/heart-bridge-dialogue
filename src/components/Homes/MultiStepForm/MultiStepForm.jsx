@@ -1,86 +1,90 @@
-import React, { useEffect, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import BasicInfo from "./BasicInfo";
-import Perspectives from "./Perspectives";
-import Personalities from "./Personalities";
-import ProgressStepper from "./progress-stepper";
-import AllInformation from "./AllInformation";
-import { db } from "../../../config/firebaseConfig";
+import React, { useEffect, useState } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import BasicInfo from './BasicInfo'
+import Perspectives from './Perspectives'
+import Personalities from './Personalities'
+import ProgressStepper from './progress-stepper'
+import AllInformation from './AllInformation'
+import { db } from '../../../config/firebaseConfig'
 import { ref, set, push } from 'firebase/database'
-import Aiheadline from "../Aiheadline";
+import Aiheadline from '../Aiheadline'
 
 const MultiStepForm = () => {
-  const navigate = useNavigate();
-  const methods = useForm();
-  const { trigger, watch, setValue, reset } = methods;
-  const [currentStep, setCurrentStep] = useState(1);
+  const navigate = useNavigate()
+  const methods = useForm()
+  const { trigger, watch, setValue, reset } = methods
+  const [currentStep, setCurrentStep] = useState(1)
 
   useEffect(() => {
-    const savedData = localStorage.getItem("multiStepFormData");
+    const savedData = localStorage.getItem('multiStepFormData')
     if (savedData) {
-      const parsedData = JSON.parse(savedData);
+      const parsedData = JSON.parse(savedData)
       Object.keys(parsedData).forEach((key) => {
-        setValue(key, parsedData[key]);
-      });
+        setValue(key, parsedData[key])
+      })
     }
-  }, [setValue]);
+  }, [setValue])
 
-  const formData = watch();
+  const formData = watch()
 
   // Save form data to localStorage
   useEffect(() => {
-    localStorage.setItem("multiStepFormData", JSON.stringify(formData));
-  }, [formData]);
+    localStorage.setItem('multiStepFormData', JSON.stringify(formData))
+  }, [formData])
 
   // Handle next step change
   const handleNextStep = async () => {
-    const isValid = await trigger();
+    const isValid = await trigger()
     if (isValid) {
-      setCurrentStep((prevStep) => prevStep + 1);
+      setCurrentStep((prevStep) => prevStep + 1)
     }
-  };
+  }
   // Handle previous step change
   const handlePreviousStep = () => {
-    setCurrentStep((prevStep) => prevStep - 1);
-  };
-
-const onSubmit = async (data) => {
-  try {
-    const user = JSON.parse(localStorage.getItem('user'))
-
-    if (!user || !user.uid) {
-      toast.error('User not authenticated!')
-      return
-    }
-
-    // Create a reference with push() to get a unique key
-    const formSubmissionsRef = ref(db, `users/${user.uid}/formSubmissions`)
-    const newFormRef = push(formSubmissionsRef)
-
-    // Get the auto-generated ID
-    const submissionId = newFormRef.key
-
-    await set(newFormRef, {
-      ...data,
-      submittedAt: new Date().toISOString(),
-      status: 'pending',
-    })
-
-    toast.success('Form submitted successfully!')
-    localStorage.removeItem('multiStepFormData')
-    reset()
-
-    setTimeout(() => {
-      navigate(`/messages/${submissionId}`) 
-    }, 1500)
-  } catch (error) {
-    console.error('Submission error:', error)
-    toast.error('Failed to submit form. Please try again.')
+    setCurrentStep((prevStep) => prevStep - 1)
   }
-}
+
+  const onSubmit = async (data) => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user'))
+
+      if (!user || !user.uid) {
+        toast.error('Please login to submit the form')
+        // Redirect to login page after 2 seconds
+        setTimeout(() => {
+          navigate('/login', { state: { from: '/form' } }) // You can pass the current path to redirect back after login
+        }, 2000)
+        return
+      }
+
+      // Create a reference with push() to get a unique key
+      const formSubmissionsRef = ref(db, `users/${user.uid}/formSubmissions`)
+      const newFormRef = push(formSubmissionsRef)
+
+      // Get the auto-generated ID
+      const submissionId = newFormRef.key
+
+      await set(newFormRef, {
+        ...data,
+        submittedAt: new Date().toISOString(),
+        status: 'pending',
+      })
+
+      toast.success('Form submitted successfully!')
+      localStorage.removeItem('multiStepFormData')
+      reset()
+
+      setTimeout(() => {
+        navigate(`/messages/${submissionId}`)
+      }, 1500)
+    } catch (error) {
+      console.error('Submission error:', error)
+      toast.error('Failed to submit form. Please try again.')
+    }
+  }
 
   return (
     <div className="container bg-white">
@@ -130,7 +134,6 @@ const onSubmit = async (data) => {
                 handleNextStep={handleNextStep}
                 handlePreviousStep={handlePreviousStep}
                 data={formData}
-                // handleSubmitForm={onSubmit}
               />
             )}
           </form>
@@ -138,6 +141,6 @@ const onSubmit = async (data) => {
       </FormProvider>
     </div>
   )
-};
+}
 
-export default MultiStepForm;
+export default MultiStepForm
