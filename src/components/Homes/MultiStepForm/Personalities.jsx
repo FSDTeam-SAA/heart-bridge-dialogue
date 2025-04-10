@@ -80,7 +80,7 @@ const Personalities = ({ handlePreviousStep, handleNextStep }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           {/* Person 1 */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-gray-600 mb-2 md:hidden">
+            <h3 className="text-lg font-medium text-gray-600 mb-2 ">
               Person 1
             </h3>
             <div>
@@ -207,7 +207,7 @@ const Personalities = ({ handlePreviousStep, handleNextStep }) => {
 
           {/* Person 2 */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-gray-600 mb-2 md:hidden">
+            <h3 className="text-lg font-medium text-gray-600 mb-2 ">
               Person 2
             </h3>
             <div>
