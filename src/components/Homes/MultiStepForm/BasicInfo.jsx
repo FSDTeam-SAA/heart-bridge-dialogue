@@ -95,7 +95,7 @@ const BasicInfo = ({ handleNextStep }) => {
           <input
             type="text"
             {...register("relationshipTitle", { required: true })}
-            placeholder="E.g., Relationshop whit partner"
+            placeholder=""
             className="w-full border border-gray py-2 px-2 rounded-lg mt-2"
           />
           {errors?.relationshipTitle && (
