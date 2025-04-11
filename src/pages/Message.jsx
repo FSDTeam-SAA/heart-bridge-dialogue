@@ -9,6 +9,7 @@ import RelationshipHeader from '../components/relationship-header'
 import MessageInput from '../components/message-input'
 import SuggestedQuestions from '../components/suggested-questions'
 import ConversationHistory from '../components/conversation-history'
+import { useRef } from 'react'
 
 const Message = () => {
   const { id } = useParams()
@@ -16,6 +17,7 @@ const Message = () => {
   const [searchParams] = useSearchParams()
   const conversationParam = searchParams.get('conversation')
   const isNewConversation = searchParams.get('new') === 'true'
+  const hasCheckedLimit = useRef(false)
 
   const [messages, setMessages] = useState([])
   const [conversations, setConversations] = useState([])
@@ -102,34 +104,65 @@ const Message = () => {
   }, [id, conversationParam, isNewConversation, relationship])
 
   // Check message limit
-  useEffect(() => {
-    checkMessageLimit()
-  }, [])
+ useEffect(() => {
+   if (!hasCheckedLimit.current) {
+     checkMessageLimit()
+     hasCheckedLimit.current = true
+   }
+ }, [])
+
+  // const checkMessageLimit = async () => {
+  //   try {
+  //     const user = JSON.parse(localStorage.getItem('user'))
+  //     if (!user?.email) return
+
+  //     const response = await fetch(`${BACKEND_URL}/api/send-message`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         email: user.email,
+  //         message: 'check_limit',
+  //       }),
+  //     })
+
+  //     const data = await response.json()
+
+  //     if (data.status === 'limit_reached') {
+  //       setLimitReached(true)
+  //     } else if (data.remainingMessages !== undefined) {
+  //       setMessageLimit(data.remainingMessages + data.messagesSent)
+  //       setMessagesSent(data.messagesSent)
+  //     }
+  //   } catch (error) {
+  //     console.error('Error checking message limit:', error)
+  //   }
+  // }
 
   const checkMessageLimit = async () => {
     try {
       const user = JSON.parse(localStorage.getItem('user'))
       if (!user?.email) return
 
-      const response = await fetch(`${BACKEND_URL}/api/send-message`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: user.email,
-          message: 'check_limit',
-        }),
-      })
+      const response = await fetch(
+        `${BACKEND_URL}/check-plan?email=${encodeURIComponent(user.email)}`
+      )
 
       const data = await response.json()
 
-      if (data.status === 'limit_reached') {
-        setLimitReached(true)
-      } else if (data.remainingMessages !== undefined) {
-        setMessageLimit(data.remainingMessages + data.messagesSent)
-        setMessagesSent(data.messagesSent)
+      if (!data.success) {
+        // Handle cases where no active plan is found or limit is exceeded
+        if (data.planStatus === 'finished') {
+          setLimitReached(true)
+        }
+        return
       }
+
+      // Update state with plan information
+      setMessageLimit(data.messageLimit)
+      setMessagesSent(data.messagesSent)
+      setLimitReached(data.messagesSent >= data.messageLimit)
     } catch (error) {
       console.error('Error checking message limit:', error)
     }
