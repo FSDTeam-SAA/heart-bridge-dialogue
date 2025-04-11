@@ -256,7 +256,7 @@ export default function SignUp() {
               name="email"
               value={registerData.email}
               onChange={handleInput}
-              placeholder="Enter Your Email Address"
+              placeholder="Enter your email address"
               className={`w-full px-4 py-2 mt-1 border rounded-md focus:outline-none ${
                 errors.email
                   ? 'border-red-500'
@@ -293,7 +293,7 @@ export default function SignUp() {
             <ReCAPTCHA
               ref={recaptchaRef}
               sitekey="6LchZxArAAAAANZTztFG4lkBOQzcP8LKyMv97UyT"
-              // sitekey="6LfAGRIrAAAAABsC4Aq1nvRnVlFxB8aCRq-RM06_" for localhost 
+              // sitekey="6LfAGRIrAAAAABsC4Aq1nvRnVlFxB8aCRq-RM06_" for localhost
               onChange={handleCaptchaChange}
               onExpired={handleCaptchaExpired}
               onErrored={handleCaptchaError}
@@ -312,7 +312,7 @@ export default function SignUp() {
             className={`w-full py-2 rounded-md transition ${
               captchaVerified && !loading
                 ? 'bg-pink-700 text-white hover:bg-pink-800'
-                : 'bg-pink-400 text-white cursor-not-allowed'
+                : 'bg-pink-700 text-white cursor-not-allowed'
             }`}
           >
             {loading ? 'Processing...' : 'Create account'}

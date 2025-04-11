@@ -52,10 +52,10 @@ const MultiStepForm = () => {
       const user = JSON.parse(localStorage.getItem('user'))
 
       if (!user || !user.uid) {
-        toast.error('Please login to submit the form')
+        toast.error('Please signup or login to submit the form')
         // Redirect to login page after 2 seconds
         setTimeout(() => {
-          navigate('/login', { state: { from: '/form' } }) // You can pass the current path to redirect back after login
+          navigate('/signup', { state: { from: '/form' } }) // You can pass the current path to redirect back after login
         }, 2000)
         return
       }
