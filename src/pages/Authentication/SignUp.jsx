@@ -235,7 +235,7 @@ export default function SignUp() {
               name="fullName"
               value={registerData.fullName}
               onChange={handleInput}
-              placeholder="Enter your Full Name"
+              placeholder="Enter your full name"
               className={`w-full px-4 py-2 mt-1 border rounded-md focus:outline-none ${
                 errors.fullName
                   ? 'border-red-500'

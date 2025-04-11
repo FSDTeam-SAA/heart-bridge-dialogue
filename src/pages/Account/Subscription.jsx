@@ -404,7 +404,6 @@ export default function Subscription() {
       default:
         return [
           '10 messages',
-          'Text-based insights',
           'Basic relationship analysis',
         ]
     }
