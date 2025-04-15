@@ -22,18 +22,20 @@ import Message from '../pages/Message'
 import ForgetPass from '../pages/Authentication/ForgotPass'
 import ResetPassword from '../pages/Authentication/ResetPassword'
 import Conversations from '../pages/conversations'
+import Analytics from '../components/Analytics'
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Main />,
+    element: (
+      <Analytics>
+        <Main />
+      </Analytics>
+    ),
     children: [
       {
         path: '/',
-        element: (
-         
-            <Home />
-        ),
+        element: <Home />,
       },
       {
         path: '*',
@@ -65,7 +67,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/conversations/:id',
-        element: <Conversations/>
+        element: <Conversations />,
       },
       {
         path: '/verify-email',
