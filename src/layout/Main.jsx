@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Navbar from '../shared/Navbar/Navbar';
 import { Outlet } from 'react-router-dom';
-import Analytics from '../components/Analytics';
+import { usePageTracking } from '../hooks/usePageTracking';
 
 const Main = () => {
+    usePageTracking()
     return (
       <div>
         <Navbar />
-        <Analytics />
         <Outlet />
       </div>
     )
