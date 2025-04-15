@@ -292,9 +292,9 @@ export default function SignUp() {
           <div className=" w-full">
             <ReCAPTCHA
               ref={recaptchaRef}
-              // sitekey="6LchZxArAAAAANZTztFG4lkBOQzcP8LKyMv97UyT"
+              sitekey="6LchZxArAAAAANZTztFG4lkBOQzcP8LKyMv97UyT"
               // for localhost
-              sitekey="6LfAGRIrAAAAABsC4Aq1nvRnVlFxB8aCRq-RM06_"
+              // sitekey="6LfAGRIrAAAAABsC4Aq1nvRnVlFxB8aCRq-RM06_"
               onChange={handleCaptchaChange}
               onExpired={handleCaptchaExpired}
               onErrored={handleCaptchaError}
